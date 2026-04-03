@@ -1,0 +1,7 @@
+# Chezmoi configuration - Managed by chezmoi
+encryption = "age"
+[age]
+    identity = "~/.config/chezmoi/key.txt"
+    recipient = "age1hkmshk62c0y67y5rrye2fzs3zcrq0nqx2ump4umtja7ld9fnwccsefg2q7"
+    # NOTE: The age key (key.txt) must be backed up separately (e.g., in Bitwarden)
+    # Without this key, encrypted files cannot be recovered
