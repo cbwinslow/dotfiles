@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  letta-server:
+    image: letta/letta:latest
+    container_name: letta-server
+    ports:
+      - "8283:8283"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - LETTA_PG_URI=postgresql://cbwinslow:123qweasd@host.docker.internal:5432/letta
+      - LETTA_SERVER_PASSWORD=123qweasd
+      - LETTA_API_KEY=sk-let-NzY2MDVkMWUtMGRmMy00MjExLTg1NDMtNjdhOGJjYTdiM2I0OmE3Y2I5MWM0LTdjYTctNDlmOC05N2Q0LTVkMDEyNTJiM2JiOA==
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
+    volumes:
+      - ./data:/app/data
+    networks:
+      - letta-net
+
+networks:
+  letta-net:
+    driver: bridge

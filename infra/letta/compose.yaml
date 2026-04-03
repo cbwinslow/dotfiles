@@ -1,0 +1,31 @@
+services:
+  letta_server:
+    image: letta/letta:latest
+    container_name: letta-server
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:8083:8083"
+      - "0.0.0.0:8283:8283"
+    env_file:
+      - .env
+    environment:
+      - LETTA_PG_URI=${LETTA_PG_URI}
+      - LETTA_DEBUG=True
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - letta_data:/var/lib/letta
+    networks:
+      - letta_network
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8283/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+volumes:
+  letta_data:
+networks:
+  letta_network:
+    driver: bridge

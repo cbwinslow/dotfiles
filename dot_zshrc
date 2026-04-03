@@ -332,3 +332,8 @@ alias bw-setup='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh setup'
 
 # Quick access to session (for AI agents)
 alias bw-session='source ~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh session'
+
+# Bitwarden CLI integration
+if [ -f "{{ .chezmoi.homeDir }}/.config/bitwarden/bw-helper.sh" ]; then
+    source "{{ .chezmoi.homeDir }}/.config/bitwarden/bw-helper.sh"
+fi

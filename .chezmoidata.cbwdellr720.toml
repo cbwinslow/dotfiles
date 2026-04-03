@@ -1,0 +1,20 @@
+# Machine-specific data for cbwdellr720
+# This file overrides .chezmoidata.toml for this specific machine
+
+hostname = "cbwdellr720"
+os = "linux"
+arch = "amd64"
+shell = "zsh"
+editor = "nvim"
+browser = "firefox"
+terminal = "alacritty"
+
+# Docker settings
+docker_compose_projects = ["letta", "openclaw", "n8n", "local-ai"]
+
+# GPU settings
+has_gpu = true
+gpu_type = "nvidia"
+
+# Network
+tailscale_enabled = true

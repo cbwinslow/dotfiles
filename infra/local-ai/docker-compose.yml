@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  local-ai:
+    image: quay.io/go-skynet/local-ai:latest
+    container_name: local-ai
+    ports:
+      - "8082:8080"
+      - "8083:8081"
+    environment:
+      - THREADS=${THREADS:-8}
+      - CONTEXT_SIZE=${CONTEXT_SIZE:-8192}
+      - MODELS_PATH=/models
+      - PRELOAD_MODELS=${PRELOAD_MODELS:-[]}
+      - BACKEND_ARGS=${BACKEND_ARGS:---threads 8}
+      - REBUILD=false
+      - DEBUG=true
+      - ADDRESS=:8082
+      - GRPC_ADDRESS=:8083
+      - LOCALAI_BACKEND_GALLERIES=[{"name":"localai","url":"github:mudler/LocalAI/backend/index.yaml@master"}]
+      - LOCALAI_AUTOLOAD_BACKEND_GALLERIES=true
+    volumes:
+      - ./models:/models:ro
+      - ./models/llama.cpp:/models/llama.cpp:ro
+      - ./data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    network_mode: host
+
+  # Optional: WebUI for LocalAI
+  # localai-webui:
+  #   image: ghcr.io/mudler/localai-ui:latest
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - LOCALAI_API_URL=http://local-ai:8080
+  #   depends_on:
+  #     - local-ai
+  #   restart: unless-stopped
+  #   networks:
+  #     - ai-network

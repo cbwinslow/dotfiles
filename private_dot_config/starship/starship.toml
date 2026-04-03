@@ -1,0 +1,61 @@
+format = """
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$ruby\
+$rust\
+$golang\
+$docker_context\
+$env_var\
+$cmd_duration\
+$character"""
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+
+[directory]
+truncation_length = 3
+fish_style_pwd_dir_length = 1
+
+[git_branch]
+symbol = " "
+
+[git_status]
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+deleted = "✘"
+modified = "!"
+staged = "+"
+renamed = "»"
+stashed = "$"
+untracked = "?"
+
+[cmd_duration]
+min_time = 2000
+format = " took [$duration]($style) "
+
+[nodejs]
+symbol = " "
+
+[python]
+symbol = " "
+
+[ruby]
+symbol = " "
+
+[rust]
+symbol = " "
+
+[golang]
+symbol = " "
+
+[docker_context]
+symbol = " "
+
+[direnv]
+disabled = false
