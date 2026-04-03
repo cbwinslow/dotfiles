@@ -1,0 +1,83 @@
+# Claude Agent Configuration
+# Location: ~/dotfiles/ai/agents/claude/config.yaml
+# Inherits from: ~/dotfiles/ai/base/base_agent.yaml
+
+# ★ Shared Resources - Centralized for all agents ★
+shared_resources:
+  skills_path: ~/dotfiles/ai/shared/skills
+  tools_path: ~/dotfiles/ai/shared/tools
+  scripts_path: ~/dotfiles/ai/shared/scripts
+  mcp_servers_path: ~/dotfiles/ai/shared/mcp
+  docs_path: ~/dotfiles/ai/shared/docs
+
+# Agent-specific settings (overrides base config)
+extends: ../../base/base_agent.yaml
+
+name: claude_agent
+framework: langchain
+
+# Claude-specific tools
+tools:
+  - file_system
+  - terminal
+  - search
+  - web_fetch
+  - code_analysis
+  - cbw_rag.semantic_search
+  - cbw_rag.find_duplicates
+  - cbw_rag.similar_code
+  - cbw_rag.index_files
+  - letta_server.store_conversation
+  - letta_server.search_memories
+  - letta_server.get_memory_stats
+
+# Claude-specific skills
+skills:
+  - reasoning
+  - analysis
+  - writing
+  - code_review
+  - documentation
+  - cbw_rag_query
+  - cbw_find_duplicates
+  - cbw_similar_code
+
+# Context settings for Claude (supports large context)
+context:
+  max_context_length: 200000
+  auto_save_interval: 900
+
+# Processing settings for deep reasoning
+processing:
+  max_concurrent_tasks: 2
+  timeout_seconds: 900
+  retry_attempts: 3
+  batch_size: 3
+
+# Behavior settings for Claude
+behavior:
+  max_iterations: 20
+  allow_self_modification: true
+  require_approval: true
+  auto_save_progress: true
+  reasoning_depth: "deep"
+
+# Writing settings
+writing:
+  style: "professional"
+  tone: "analytical"
+  citation_format: "APA"
+  word_limit: 5000
+
+# Security settings specific to Claude
+security:
+  allowed_paths:
+    - /home/cbwinslow/workspace
+    - /home/cbwinslow/dotfiles
+    - /home/cbwinslow/docs
+  blocked_commands:
+    - rm -rf /
+    - sudo
+    - chmod 777
+    - curl
+    - wget

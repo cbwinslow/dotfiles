@@ -1,0 +1,153 @@
+# OpenCode Agent Configuration
+# Configuration for the OpenCode AI agent
+
+name: opencode_agent
+framework: langchain
+provider: openai
+model: gpt-4o
+memory_backend: epstein_memory
+
+# Skill paths configuration - load skills from centralized AI directory
+skill_paths:
+  - /home/cbwinslow/dotfiles/ai/skills
+  - /home/cbwinslow/dotfiles/ai/agents/opencode/skills
+
+# PostgreSQL connection (can be overridden by environment variables)
+database:
+  host: localhost
+  port: 5432
+  database: epstein
+  user: cbwinslow
+  password: 123qweasd
+  sslmode: prefer
+
+# Agent-specific settings - skills loaded from skill_paths
+skills:
+  - letta_server
+  - memory
+  - code_generation
+  - data_processing
+  - file_system
+  - git_operations
+  - terminal
+
+tools:
+  - file_system
+  - git
+  - terminal
+  - search
+  - web_fetch
+  - letta_server.store_conversation
+  - letta_server.search_memories
+  - letta_server.get_memory_stats
+  - letta_server.check_server_health
+  - letta_server.setup_agent_memory
+  - letta_server.sync_agent_context
+
+# Memory configuration
+memory:
+  backend: letta_server
+  default_ttl_days: 30
+  max_memory_size_mb: 50
+  agent_id: "agent-1167f15a-a10a-4595-b962-ec0f372aae0d"
+  # Memory types available
+  memory_types:
+    - core
+    - archival
+    - context
+    - persona
+    - human
+
+# Letta Server Integration
+letta_server:
+  server_url: "${LETTA_SERVER_URL}"
+  api_key: "${LETTA_API_KEY}"
+  agent_name: "opencode"
+  agent_id: "agent-1167f15a-a10a-4595-b962-ec0f372aae0d"
+  auto_sync: true
+  skills:
+    - "memory_management"
+    - "entity_extraction"
+    - "conversation_logging"
+  cleanup_interval_hours: 12
+
+# Context management
+context:
+  max_context_length: 10000
+  auto_save_interval: 300  # seconds
+  persistent_context: true
+
+# Processing settings
+processing:
+  max_concurrent_tasks: 5
+  timeout_seconds: 300
+  retry_attempts: 3
+  batch_size: 10
+
+# Integration settings
+integrations:
+  letta:
+    enabled: true
+    server_url: http://localhost:8283
+    api_key: ${LETTA_API_KEY}
+    agent_id: "agent-1167f15a-a10a-4595-b962-ec0f372aae0d"
+  epstein_memory:
+    enabled: true
+    package_path: /home/cbwinslow/dotfiles/ai/packages/epstein_memory
+    database: "epstein"
+  letta_skills:
+    enabled: true
+    skill_directory: "/home/cbwinslow/dotfiles/ai/skills/letta_server"
+    auto_load: true
+
+# Skill loading configuration
+skill_loading:
+  enabled: true
+  auto_load_skills: true
+  skill_directories:
+    - "/home/cbwinslow/dotfiles/ai/skills"
+    - "/home/cbwinslow/dotfiles/ai/agents/opencode/skills"
+  priority_skills:
+    - "letta_server"
+    - "memory"
+  lazy_load: false
+  preload_all: true
+
+# Conversation logging configuration
+conversation_logging:
+  enabled: true
+  log_directory: "/home/cbwinslow/workspace/epstein/scripts/conversation_logger/logs"
+  auto_log: true
+  extract_decisions: true
+  extract_action_items: true
+  store_to_letta: true
+  letta_agent_id: "agent-1167f15a-a10a-4595-b962-ec0f372aae0d"
+
+# Environment-specific overrides
+environments:
+  development:
+    debug: true
+    log_level: DEBUG
+    memory_ttl_days: 7
+  production:
+    debug: false
+    log_level: INFO
+    memory_ttl_days: 90
+
+# Agent behavior
+behavior:
+  max_iterations: 10
+  allow_self_modification: false
+  require_approval: false
+  auto_save_progress: true
+
+# Security settings
+security:
+  allow_file_access: true
+  allowed_paths:
+    - /home/cbwinslow/workspace
+    - /home/cbwinslow/dotfiles
+  blocked_commands:
+    - rm -rf /
+    - sudo
+    - chmod 777

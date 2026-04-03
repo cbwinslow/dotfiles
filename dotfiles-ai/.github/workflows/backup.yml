@@ -1,0 +1,22 @@
+name: Daily Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create backup
+      run: python scripts/github_backup.py --create-backup
+    
+    - name: Upload backup to storage
+      uses: actions/upload-artifact@v3
+      with:
+        name: daily-backup
+        path: backups/

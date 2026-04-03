@@ -1,0 +1,353 @@
+# Memory Types Configuration
+# Defines all Letta-compatible memory types for the Agent Memory System
+# Location: ~/dotfiles/ai/configs/memory_types.yaml
+
+# Core Memory Types (Letta Standard)
+memory_types:
+  # Core memory blocks - always visible in context window
+  core:
+    description: "Always-visible memory blocks in context window"
+    ttl_days: -1  # Never expires
+    max_entries: null  # Limited by context window, not count
+    priority: critical
+    auto_create_default_blocks: true
+    default_blocks:
+      - label: "persona"
+        description: "Agent personality and behavior"
+        limit: 5000
+        required: true
+        content_template: |
+          You are {agent_name}, an AI assistant with the following traits:
+          - Helpful, harmless, and honest
+          - Always searches memories before answering
+          - Saves all important information to memory
+          - Collaborates with other agents when needed
+          
+      - label: "human"
+        description: "User information and preferences"
+        limit: 5000
+        required: false
+        content_template: |
+          User preferences and context:
+          - Name: {user_name}
+          - Technical level: {technical_level}
+          - Communication style: {communication_style}
+          
+      - label: "scratchpad"
+        description: "Working memory for calculations and reasoning"
+        limit: 3000
+        required: true
+        content_template: ""
+        
+      - label: "guidelines"
+        description: "Important rules and guidelines to follow"
+        limit: 4000
+        required: true
+        content_template: |
+          ALWAYS follow these guidelines:
+          1. Search memories before making decisions
+          2. Save all important information
+          3. Use consistent tagging
+          4. Respect user preferences from 'human' block
+          5. Collaborate with other agents
+          
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - attach_to_agent
+      - detach_from_agent
+      
+    validation:
+      max_block_size: 10000
+      allowed_labels:
+        - persona
+        - human
+        - scratchpad
+        - guidelines
+        - preferences
+        - project_context
+        - custom_*
+
+  # Archival memory - long-term storage, retrieved via search
+  archival:
+    description: "Long-term storage for conversations and documents"
+    ttl_days: 365
+    max_entries: 10000
+    priority: high
+    auto_save_conversations: true
+    auto_extract_entities: true
+    
+    storage_format:
+      type: "passage"  # Letta passage format
+      include_metadata: true
+      include_embeddings: true
+      
+    search_config:
+      default_limit: 10
+      max_limit: 100
+      min_relevance_score: 0.5
+      include_archival: true
+      
+    operations:
+      - store
+      - search
+      - retrieve
+      - delete
+      - update
+      
+    entity_extraction:
+      enabled: true
+      entity_types:
+        - person
+        - organization
+        - location
+        - concept
+        - technology
+        - decision
+        - action_item
+        - code_snippet
+        - file_path
+        - url
+
+  # Context memory - session-specific working state
+  context:
+    description: "Session-specific working memory and task context"
+    ttl_days: 30
+    max_entries: 500
+    priority: medium
+    auto_cleanup: true
+    
+    storage_format:
+      type: "key_value"  # Key-value store for quick access
+      
+    use_cases:
+      - current_task
+      - working_memory
+      - session_state
+      - temporary_calculations
+      - draft_content
+      
+    operations:
+      - set
+      - get
+      - delete
+      - clear_session
+      - list_all
+      
+    lifecycle:
+      auto_expire: true
+      expiration_trigger: session_end
+      cleanup_interval_hours: 24
+
+  # Persona memory - stored as core block
+  persona:
+    description: "Agent identity and behavior (stored as core block)"
+    ttl_days: -1
+    max_entries: 1
+    priority: critical
+    storage_type: "core_block"
+    block_label: "persona"
+    
+    template_variables:
+      - agent_name
+      - agent_type
+      - capabilities
+      - specializations
+      - communication_style
+      
+    operations:
+      - set_persona
+      - get_persona
+      - update_persona
+      - reset_persona
+
+  # Human memory - stored as core block
+  human:
+    description: "User information and preferences (stored as core block)"
+    ttl_days: -1
+    max_entries: 1
+    priority: high
+    storage_type: "core_block"
+    block_label: "human"
+    
+    tracked_information:
+      - name
+      - preferences
+      - technical_level
+      - communication_style
+      - previous_interactions_summary
+      - important_facts
+      - project_context
+      
+    operations:
+      - set_human_info
+      - get_human_info
+      - update_human_info
+      - add_preference
+      - add_fact
+
+# Memory Block Management
+block_management:
+  # CRUD operations for memory blocks
+  operations:
+    create_block:
+      endpoint: "POST /v1/blocks"
+      parameters:
+        - label
+        - value
+        - description
+        - limit
+        
+    get_block:
+      endpoint: "GET /v1/blocks/{block_id}"
+      
+    update_block:
+      endpoint: "PUT /v1/blocks/{block_id}"
+      parameters:
+        - value
+        - limit
+        - description
+        
+    delete_block:
+      endpoint: "DELETE /v1/blocks/{block_id}"
+      
+    list_blocks:
+      endpoint: "GET /v1/blocks"
+      parameters:
+        - label
+        - label_search
+        
+    attach_to_agent:
+      endpoint: "POST /v1/agents/{agent_id}/blocks/{block_id}/attach"
+      
+    detach_from_agent:
+      endpoint: "POST /v1/agents/{agent_id}/blocks/{block_id}/detach"
+      
+    get_agent_blocks:
+      endpoint: "GET /v1/agents/{agent_id}/blocks"
+      
+    get_agent_block_by_label:
+      endpoint: "GET /v1/agents/{agent_id}/blocks/{label}"
+      
+    update_agent_block:
+      endpoint: "PUT /v1/agents/{agent_id}/blocks/{label}"
+      parameters:
+        - value
+
+# Source Attribution
+sources:
+  enabled: true
+  track_sources: true
+  source_types:
+    - conversation
+    - document
+    - tool_output
+    - user_input
+    - agent_decision
+    - external_api
+    - file_import
+    
+  metadata_fields:
+    - source_type
+    - source_id
+    - timestamp
+    - agent_name
+    - user_name
+    - session_id
+    - conversation_id
+
+# Agent Self-Editing Tools
+self_editing_tools:
+  core_memory_tools:
+    - name: "memory_edit"
+      description: "Edit a core memory block"
+      parameters: [block_label, new_value]
+      
+    - name: "memory_append"
+      description: "Append content to a core memory block"
+      parameters: [block_label, content_to_add]
+      
+    - name: "memory_search"
+      description: "Search archival memory"
+      parameters: [query, memory_type, limit]
+      
+    - name: "memory_delete"
+      description: "Delete a memory by ID"
+      parameters: [memory_id]
+      
+  archival_memory_tools:
+    - name: "archival_memory_insert"
+      description: "Insert content into archival memory"
+      parameters: [content, tags, source]
+      
+    - name: "archival_memory_search"
+      description: "Search archival memory"
+      parameters: [query, limit]
+      
+    - name: "archival_memory_delete"
+      description: "Delete from archival memory"
+      parameters: [memory_id]
+      
+  context_tools:
+    - name: "context_set"
+      description: "Set a context value"
+      parameters: [key, value]
+      
+    - name: "context_get"
+      description: "Get a context value"
+      parameters: [key]
+      
+    - name: "context_clear"
+      description: "Clear all context"
+      parameters: []
+
+# Validation Rules
+validation:
+  # Core memory validation
+  core:
+    max_block_size: 10000
+    allowed_labels:
+      pattern: "^[a-z_]+$"
+      reserved:
+        - persona
+        - human
+        - scratchpad
+        - guidelines
+        
+  # Archival memory validation
+  archival:
+    max_content_length: 100000
+    required_fields:
+      - content
+      - memory_type
+    optional_fields:
+      - tags
+      - metadata
+      - source
+      
+  # Context memory validation
+  context:
+    max_key_length: 100
+    max_value_length: 10000
+    allowed_key_pattern: "^[a-zA-Z0-9_]+$"
+
+# Backup and Migration
+backup:
+  enabled: true
+  backup_types:
+    - core_memory_blocks
+    - archival_memories
+    - context_state
+    - agent_configurations
+    
+  schedule:
+    full_backup: daily
+    incremental: hourly
+    retention_days: 90
+    
+  migration:
+    version: "1.0.0"
+    auto_migrate: true
+    backup_before_migrate: true

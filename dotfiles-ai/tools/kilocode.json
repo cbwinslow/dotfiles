@@ -1,0 +1,102 @@
+{
+  "$schema": "https://kilo.ai/schemas/config.json",
+  "version": "1.0.0",
+  
+  "providers": {
+    "openrouter": {
+      "id": "openrouter",
+      "label": "OpenRouter",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKeyEnv": "OPENROUTER_API_KEY",
+      "defaultModel": "openrouter/qwen/qwen2.5-coder",
+      "models": [
+        {
+          "id": "openrouter/qwen/qwen2.5-coder",
+          "label": "Qwen 2.5 Coder (Free tier)"
+        },
+        {
+          "id": "openrouter/deepseek/deepseek-coder",
+          "label": "DeepSeek Coder (Free tier)"
+        },
+        {
+          "id": "openrouter/anthropic/claude-3.7-sonnet",
+          "label": "Claude 3.7 Sonnet"
+        },
+        {
+          "id": "openrouter/openai/gpt-4.5-mini",
+          "label": "GPT-4.5 Mini"
+        }
+      ]
+    },
+    "gemini": {
+      "id": "gemini",
+      "label": "Google Gemini",
+      "apiKeyEnv": "GEMINI_API_KEY",
+      "defaultModel": "gemini-2.5-flash"
+    }
+  },
+  
+  "defaults": {
+    "provider": "openrouter",
+    "model": "openrouter/qwen/qwen2.5-coder",
+    "skillsDirs": [
+      "~/.config/ai/skills"
+    ],
+    "workflowsDirs": [
+      "~/.config/ai/workflows"
+    ],
+    "agentsDir": "~/.config/ai/agents"
+  },
+  
+  "cli": {
+    "defaultAgent": "coding",
+    "autoLoadSkills": true,
+    "autoLoadWorkflows": true,
+    "logsDir": "~/.local/state/ai/logs/kilo"
+  },
+  
+  "modes": {
+    "architect": {
+      "agent": "ops",
+      "skills": ["infrastructure/proxmox", "infrastructure/networking"],
+      "model": "openrouter/anthropic/claude-3.7-sonnet"
+    },
+    "code": {
+      "agent": "coding",
+      "skills": ["coding/python-refactor", "coding/typescript-patterns"],
+      "model": "openrouter/qwen/qwen2.5-coder"
+    },
+    "debug": {
+      "agent": "coding",
+      "skills": ["shell/system-maintenance", "shell/docker-ops"],
+      "model": "openrouter/anthropic/claude-3.7-sonnet"
+    },
+    "research": {
+      "agent": "research",
+      "skills": ["research/web-search", "research/document-analysis"],
+      "model": "openrouter/anthropic/claude-3.7-sonnet"
+    }
+  },
+  
+  "integrations": {
+    "gitlab": {
+      "enabled": true,
+      "ciWorkflows": [
+        "~/.config/ai/workflows/repo-audit.md",
+        "~/.config/ai/workflows/code-review.md"
+      ]
+    }
+  },
+  
+  "security": {
+    "allowShell": true,
+    "allowNetwork": true,
+    "requireApprovalForDestructive": true,
+    "allowedPaths": [
+      "/home/cbwinslow/workspace",
+      "/home/cbwinslow/dotfiles",
+      "/home/cbwinslow/infra",
+      "/home/cbwinslow/projects"
+    ]
+  }
+}

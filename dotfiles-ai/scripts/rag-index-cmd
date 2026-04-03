@@ -1,0 +1,179 @@
+#!/bin/bash
+# CBW RAG Indexing Script
+# Quick commands for managing the RAG index
+
+set -e
+
+# Load environment
+source ~/.bash_secrets 2>/dev/null || true
+
+DB_URL="${CBW_RAG_DATABASE:-postgresql://cbwinslow:123qweasd@localhost:5432/cbw_rag}"
+INDEXER="/home/cbwinslow/projects/ai/rag_system/cbw_indexer.py"
+BULK_INDEXER="/home/cbwinslow/dotfiles/ai/scripts/cbw_rag_bulk_indexer.py"
+
+show_help() {
+    cat << EOF
+CBW RAG Index Management
+
+Usage: rag-index-cmd <command> [options]
+
+Commands:
+  index-all              Index all configured folders
+  index-dotfiles         Index dotfiles folder and home configs
+  index <path>           Index specific path
+  stats                  Show database statistics
+  query <sql>            Run SQL query
+  search <term>          Search for files
+  duplicates             Find duplicate files
+  recent [days]          Show recently modified files
+  reindex                Force reindex all
+  clean                  Mark deleted files
+  views                  List available database views
+  functions              List available SQL functions
+
+Examples:
+  rag-index-cmd stats
+  rag-index-cmd search "middleware pattern"
+  rag-index-cmd query "SELECT * FROM v_python_files LIMIT 10"
+  rag-index-cmd index ~/new_project
+EOF
+}
+
+cmd_stats() {
+    echo "=== CBW RAG Database Statistics ==="
+    psql "$DB_URL" -c "SELECT * FROM get_system_stats()" 2>/dev/null || python3 "$BULK_INDEXER" --stats
+}
+
+cmd_search() {
+    local term="$1"
+    if [ -z "$term" ]; then
+        echo "Usage: rag-index-cmd search <search_term>"
+        exit 1
+    fi
+    
+    echo "Searching for: $term"
+    psql "$DB_URL" -c "SELECT file_path, file_name, line_start FROM search_files_content('$term', NULL, 10)"
+}
+
+cmd_query() {
+    local sql="$1"
+    if [ -z "$sql" ]; then
+        echo "Usage: rag-index-cmd query <SQL>"
+        exit 1
+    fi
+    
+    psql "$DB_URL" -c "$sql"
+}
+
+cmd_duplicates() {
+    echo "=== Duplicate Files ==="
+    psql "$DB_URL" -c "SELECT content_hash, duplicate_count, first_file FROM v_duplicate_groups LIMIT 20"
+}
+
+cmd_recent() {
+    local days="${1:-7}"
+    echo "=== Files Modified in Last $days Days ==="
+    psql "$DB_URL" -c "SELECT file_path, file_name, modified_at FROM find_recently_modified(NOW() - INTERVAL '$days days') LIMIT 20"
+}
+
+cmd_index_all() {
+    echo "Indexing all configured folders..."
+    python3 "$BULK_INDEXER"
+}
+
+cmd_index_dotfiles() {
+    echo "Indexing dotfiles..."
+    
+    # Index dotfiles repo
+    if [ -d "/home/cbwinslow/dotfiles" ]; then
+        python3 "$INDEXER" "/home/cbwinslow/dotfiles" --workers 4
+    fi
+    
+    # Index .config
+    if [ -d "$HOME/.config" ]; then
+        python3 "$INDEXER" "$HOME/.config" --workers 2
+    fi
+    
+    # Index individual dotfiles
+    for f in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.gitconfig"; do
+        if [ -f "$f" ]; then
+            echo "Indexing $f..."
+        fi
+    done
+}
+
+cmd_index() {
+    local path="$1"
+    if [ -z "$path" ]; then
+        echo "Usage: rag-index-cmd index <path>"
+        exit 1
+    fi
+    
+    if [ ! -e "$path" ]; then
+        echo "Error: Path does not exist: $path"
+        exit 1
+    fi
+    
+    echo "Indexing: $path"
+    python3 "$INDEXER" "$path" --workers 4
+}
+
+cmd_reindex() {
+    echo "Force reindexing all..."
+    python3 "$BULK_INDEXER" --force
+}
+
+cmd_views() {
+    echo "=== Available Views ==="
+    psql "$DB_URL" -c "SELECT table_name FROM information_schema.views WHERE table_schema = 'public' AND table_name LIKE 'v_%' ORDER BY table_name"
+}
+
+cmd_functions() {
+    echo "=== Available Functions ==="
+    psql "$DB_URL" -c "SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public' AND routine_type = 'FUNCTION' ORDER BY routine_name"
+}
+
+# Main
+case "${1:-help}" in
+    help|--help|-h)
+        show_help
+        ;;
+    stats)
+        cmd_stats
+        ;;
+    search)
+        cmd_search "$2"
+        ;;
+    query)
+        cmd_query "$2"
+        ;;
+    duplicates|dups)
+        cmd_duplicates
+        ;;
+    recent)
+        cmd_recent "$2"
+        ;;
+    index-all|all)
+        cmd_index_all
+        ;;
+    index-dotfiles|dotfiles)
+        cmd_index_dotfiles
+        ;;
+    index)
+        cmd_index "$2"
+        ;;
+    reindex)
+        cmd_reindex
+        ;;
+    views)
+        cmd_views
+        ;;
+    functions|funcs)
+        cmd_functions
+        ;;
+    *)
+        echo "Unknown command: $1"
+        show_help
+        exit 1
+        ;;
+esac

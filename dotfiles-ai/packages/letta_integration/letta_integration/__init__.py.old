@@ -1,0 +1,1034 @@
+"""
+Letta Integration Package
+Comprehensive Letta server integration for AI agents with GPU-enabled model support.
+
+Features:
+- Automatic conversation saving
+- Automatic memory creation from conversations
+- Entity extraction and storage
+- Cross-agent memory search
+- Server health monitoring
+- Memory backup to PostgreSQL
+- GPU-enabled llama.cpp model support
+- Model picker for LLM and embedding configuration
+
+Location: ~/dotfiles/ai/packages/letta_integration/
+"""
+
+import os
+import json
+import logging
+from datetime import datetime
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, asdict
+import hashlib
+
+# Try to import requests, handle if not available
+try:
+    import requests
+except ImportError:
+    requests = None
+
+# Import model picker for GPU llama.cpp support
+try:
+    from letta_model_picker import (
+        ModelPicker, LLMConfig, EmbeddingConfig,
+        GPUConfig, ModelProvider, EmbeddingProvider,
+        get_current_models, create_gpu_config, create_ollama_config
+    )
+    MODEL_PICKER_AVAILABLE = True
+except ImportError:
+    MODEL_PICKER_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class MemoryEntry:
+    """Represents a memory entry in Letta"""
+    id: str
+    agent_id: str
+    memory_type: str  # core, archival, context, persona, human
+    content: str
+    tags: List[str]
+    created_at: str
+    metadata: Dict[str, Any]
+
+
+@dataclass
+class ConversationMessage:
+    """Represents a conversation message"""
+    role: str  # user, assistant, system
+    content: str
+    timestamp: str
+    metadata: Dict[str, Any] = None
+
+
+class LettaIntegration:
+    """
+    Main Letta integration class with GPU model support.
+    
+    Provides comprehensive integration with self-hosted Letta server:
+    - Automatic conversation saving
+    - Memory management (core, archival, context, persona, human)
+    - Entity extraction and storage
+    - Cross-agent search
+    - GPU-enabled llama.cpp model support
+    - Model picker for LLM and embedding configuration
+    - Server health monitoring
+    
+    GPU Support:
+    The integration supports GPU acceleration through llama.cpp or Ollama.
+    Use configure_models() to set up GPU-enabled models.
+    
+    Example:
+        # Basic usage
+        letta = LettaIntegration(agent_name="windsurf")
+        letta.save_conversation([{"role": "user", "content": "Hello"}])
+        
+        # With GPU model
+        letta = LettaIntegration(agent_name="windsurf")
+        letta.configure_models(
+            model_path="/models/llama-3-8b-instruct.Q4_K_M.gguf",
+            n_gpu_layers=35
+        )
+        agent_id = letta.create_agent_with_config("myagent")
+    """
+    
+    def __init__(
+        self,
+        server_url: str = None,
+        api_key: str = None,
+        agent_name: str = "default_agent",
+        llm_config: Any = None,
+        embedding_config: Any = None
+    ):
+        """
+        Initialize Letta integration.
+        
+        Args:
+            server_url: Letta server URL (default: http://localhost:8283)
+            api_key: API key for authentication
+            agent_name: Default agent name
+            llm_config: LLM configuration from ModelPicker
+            embedding_config: Embedding configuration from ModelPicker
+        """
+        self.server_url = server_url or os.getenv("LETTA_SERVER_URL", "http://localhost:8283")
+        self.api_key = api_key or os.getenv("LETTA_API_KEY", "")
+        self.agent_name = agent_name
+        self.agent_id = None
+        self.session = None
+        
+        # Model configuration
+        self.llm_config = llm_config
+        self.embedding_config = embedding_config
+        self.model_picker = None
+        
+        if MODEL_PICKER_AVAILABLE:
+            self.model_picker = ModelPicker()
+            # Use provided configs or default to model picker configs
+            if not self.llm_config:
+                self.llm_config = self.model_picker.llm_config
+            if not self.embedding_config:
+                self.embedding_config = self.model_picker.embedding_config
+        
+        if requests:
+            self.session = requests.Session()
+            if self.api_key:
+                self.session.headers["Authorization"] = f"Bearer {self.api_key}"
+            self.session.headers["Content-Type"] = "application/json"
+        
+        logger.info(f"LettaIntegration initialized for agent: {agent_name}")
+        if self.llm_config:
+            logger.info(f"Using LLM: {self.llm_config.model_name} ({self.llm_config.provider.value})")
+        if self.embedding_config:
+            logger.info(f"Using Embedding: {self.embedding_config.model_name} ({self.embedding_config.provider.value})")
+    
+    def _make_request(self, method: str, endpoint: str, data: Dict = None) -> Dict:
+        """Make HTTP request to Letta server"""
+        if not self.session:
+            logger.error("Requests library not available")
+            return {"error": "Requests library not available"}
+        
+        url = f"{self.server_url}{endpoint}"
+        try:
+            if method == "GET":
+                response = self.session.get(url, params=data, timeout=30)
+            elif method == "POST":
+                response = self.session.post(url, json=data, timeout=30)
+            elif method == "PUT":
+                response = self.session.put(url, json=data, timeout=30)
+            elif method == "DELETE":
+                response = self.session.delete(url, timeout=30)
+            else:
+                logger.error(f"Unknown HTTP method: {method}")
+                return {"error": f"Unknown HTTP method: {method}"}
+            
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request failed: {e}")
+            return {"error": str(e)}
+    
+    # ==================== AGENT MANAGEMENT ====================
+    
+    def get_or_create_agent(self, agent_name: str = None) -> str:
+        """Get existing agent or create new one"""
+        agent_name = agent_name or self.agent_name
+        
+        # Try to find existing agent
+        agents = self.list_agents()
+        # Handle both list and dict responses
+        agent_list = agents if isinstance(agents, list) else agents.get("agents", [])
+        for agent in agent_list:
+            if agent.get("name") == agent_name:
+                self.agent_id = agent.get("id")
+                logger.info(f"Found existing agent: {agent_name} (ID: {self.agent_id})")
+                return self.agent_id
+        
+        # Create new agent
+        result = self.create_agent(agent_name)
+        if "id" in result:
+            self.agent_id = result["id"]
+            logger.info(f"Created new agent: {agent_name} (ID: {self.agent_id})")
+        return self.agent_id
+    
+    def list_agents(self) -> Dict:
+        """List all agents on the server"""
+        return self._make_request("GET", "/v1/agents")
+    
+    def create_agent(self, agent_name: str) -> Dict:
+        """Create a new agent"""
+        data = {
+            "name": agent_name,
+            "model": "letta/letta-free",
+            "embedding": "ollama/bge-m3:latest"
+        }
+        return self._make_request("POST", "/v1/agents", data)
+    
+    def delete_agent(self, agent_id: str = None) -> Dict:
+        """Delete an agent"""
+        agent_id = agent_id or self.agent_id
+        if not agent_id:
+            return {"error": "No agent ID provided"}
+        return self._make_request("DELETE", f"/v1/agents/{agent_id}")
+    
+    # ==================== MODEL CONFIGURATION ====================
+    
+    def configure_models(
+        self,
+        model_path: str = None,
+        n_gpu_layers: int = 35,
+        llm_model: str = None,
+        embedding_model: str = None,
+        use_ollama: bool = False,
+        preset: str = None
+    ) -> Dict[str, Any]:
+        """
+        Configure LLM and embedding models for agent creation.
+        
+        Supports GPU-enabled llama.cpp models and Ollama endpoints.
+        
+        Args:
+            model_path: Path to .gguf file for llama.cpp (GPU mode)
+            n_gpu_layers: Number of layers to offload to GPU (0-99)
+            llm_model: Ollama model name (e.g., "llama3.1:8b")
+            embedding_model: Embedding model name (e.g., "bge-m3:latest")
+            use_ollama: Use Ollama as provider
+            preset: Apply preset configuration ("fast_gpu", "quality_gpu", "cpu_fallback")
+        
+        Returns:
+            Configuration dictionary for agent creation
+            
+        Example:
+            # GPU llama.cpp
+            letta.configure_models(
+                model_path="/models/llama-3-8b-instruct.Q4_K_M.gguf",
+                n_gpu_layers=35
+            )
+            
+            # Ollama
+            letta.configure_models(
+                llm_model="llama3.1:8b",
+                embedding_model="nomic-embed-text:latest",
+                use_ollama=True
+            )
+        """
+        if not MODEL_PICKER_AVAILABLE:
+            logger.warning("ModelPicker not available, using default configuration")
+            return {
+                "model": "letta/letta-free",
+                "embedding": "ollama/bge-m3:latest"
+            }
+        
+        if preset:
+            self.model_picker.apply_preset(preset)
+            if model_path and preset in ["fast_gpu", "quality_gpu"]:
+                self.model_picker.llm_config.model_path = model_path
+        elif use_ollama or llm_model:
+            self.model_picker.use_ollama(
+                llm_model=llm_model or "llama3.1:8b",
+                embedding_model=embedding_model or "bge-m3:latest"
+            )
+        elif model_path:
+            self.model_picker.configure_gpu_llama(
+                model_path=model_path,
+                n_gpu_layers=n_gpu_layers
+            )
+        else:
+            # Default to Ollama if no specific config
+            self.model_picker.use_ollama()
+        
+        config = self.model_picker.to_letta_agent_config()
+        
+        # Update internal configs
+        self.llm_config = self.model_picker.llm_config
+        self.embedding_config = self.model_picker.embedding_config
+        
+        logger.info(f"Model configuration: {config}")
+        return config
+    
+    def create_agent_with_config(
+        self,
+        agent_name: str,
+        model_config: Dict[str, Any] = None
+    ) -> Dict:
+        """
+        Create an agent with specific model configuration.
+        
+        Args:
+            agent_name: Name for the new agent
+            model_config: Model configuration (from configure_models)
+            
+        Returns:
+            Created agent data
+        """
+        if not model_config:
+            if self.llm_config and self.embedding_config:
+                model_config = {
+                    "model": self.llm_config.to_letta_format(),
+                    "embedding": self.embedding_config.to_letta_format()
+                }
+            else:
+                model_config = {
+                    "model": "letta/letta-free",
+                    "embedding": "ollama/bge-m3:latest"
+                }
+        
+        data = {
+            "name": agent_name,
+            **model_config
+        }
+        
+        result = self._make_request("POST", "/v1/agents", data)
+        
+        if "id" in result:
+            self.agent_id = result["id"]
+            self.agent_name = agent_name
+            logger.info(f"Created agent {agent_name} with ID: {self.agent_id}")
+        
+        return result
+    
+    def get_current_model_info(self) -> Dict[str, Any]:
+        """
+        Get information about currently configured models.
+        Use this to inform agents what models they are using.
+        
+        Returns:
+            Dictionary with model information
+        """
+        if not MODEL_PICKER_AVAILABLE or not self.model_picker:
+            return {
+                "llm": {
+                    "provider": "letta-free",
+                    "model": "letta/letta-free",
+                    "using_gpu": False
+                },
+                "embedding": {
+                    "provider": "ollama",
+                    "model": "ollama/bge-m3:latest",
+                    "dimensions": 1024
+                },
+                "note": "ModelPicker not available - using defaults"
+            }
+        
+        return self.model_picker.get_model_info()
+    
+    def print_model_info(self) -> None:
+        """Print current model configuration in readable format"""
+        if MODEL_PICKER_AVAILABLE and self.model_picker:
+            self.model_picker.print_config()
+        else:
+            info = self.get_current_model_info()
+            print("\n" + "="*60)
+            print("MODEL CONFIGURATION")
+            print("="*60)
+            print(f"\n📊 LLM: {info['llm']['model']}")
+            print(f"📊 Embedding: {info['embedding']['model']}")
+            print(f"\n💻 {info.get('note', '')}")
+            print("="*60 + "\n")
+    
+    def apply_model_preset(self, preset_name: str) -> Dict[str, Any]:
+        """
+        Apply a predefined model configuration.
+        
+        Available presets:
+            - fast_gpu: Fast inference with GPU acceleration
+            - quality_gpu: High quality with full GPU utilization  
+            - cpu_fallback: CPU-only configuration
+            - ollama_standard: Standard Ollama setup
+            - letta_free: Letta's built-in free model
+        
+        Args:
+            preset_name: Name of preset to apply
+            
+        Returns:
+            Configuration dictionary
+        """
+        if not MODEL_PICKER_AVAILABLE:
+            logger.warning("ModelPicker not available")
+            return self.configure_models()
+        
+        self.model_picker.apply_preset(preset_name)
+        self.llm_config = self.model_picker.llm_config
+        self.embedding_config = self.model_picker.embedding_config
+        
+        return self.model_picker.to_letta_agent_config()
+    
+    # ==================== CONVERSATION MANAGEMENT ====================
+    
+    def save_conversation(
+        self,
+        messages: List[Dict],
+        tags: List[str] = None,
+        metadata: Dict = None
+    ) -> Dict:
+        """
+        Save entire conversation to Letta archival memory.
+        
+        Args:
+            messages: List of conversation messages
+            tags: Tags for categorization
+            metadata: Additional metadata
+        
+        Returns:
+            Result with memory_id
+        """
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        # Format conversation as text
+        conversation_text = self._format_conversation(messages)
+        
+        # Store in archival memory
+        memory_data = {
+            "text": conversation_text,
+            "tags": tags or ["conversation", self.agent_name]
+        }
+        
+        result = self._make_request(
+            "POST",
+            f"/v1/agents/{self.agent_id}/archival-memory",
+            memory_data
+        )
+        
+        logger.info(f"Saved conversation with {len(messages)} messages")
+        return result
+    
+    def _format_conversation(self, messages: List[Dict]) -> str:
+        """Format conversation messages as readable text"""
+        lines = []
+        lines.append(f"=== Conversation Log ===")
+        lines.append(f"Agent: {self.agent_name}")
+        lines.append(f"Date: {datetime.utcnow().isoformat()}")
+        lines.append("=" * 40)
+        
+        for msg in messages:
+            role = msg.get("role", "unknown")
+            content = msg.get("content", "")
+            timestamp = msg.get("timestamp", datetime.utcnow().isoformat())
+            lines.append(f"[{timestamp}] {role.upper()}: {content}")
+        
+        lines.append("=" * 40)
+        return "\n".join(lines)
+    
+    # ==================== MEMORY OPERATIONS ====================
+    
+    def search_memories(
+        self,
+        query: str,
+        memory_type: str = None,
+        tags: List[str] = None,
+        limit: int = 10
+    ) -> Dict:
+        """
+        Search memories by query.
+        
+        Args:
+            query: Search query
+            memory_type: Filter by memory type (core, archival, context, persona, human)
+            tags: Filter by tags
+            limit: Max results
+        
+        Returns:
+            List of matching memories
+        """
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        params = {
+            "query": query,
+            "limit": limit
+        }
+        
+        if memory_type:
+            params["memory_type"] = memory_type
+        if tags:
+            params["tags"] = tags
+        
+        return self._make_request(
+            "GET",
+            f"/v1/agents/{self.agent_id}/memory/search",
+            params
+        )
+    
+    def get_memories(
+        self,
+        memory_type: str = None,
+        limit: int = 100
+    ) -> Dict:
+        """Get memories, optionally filtered by type"""
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        params = {"limit": limit}
+        if memory_type:
+            params["memory_type"] = memory_type
+        
+        return self._make_request(
+            "GET",
+            f"/v1/agents/{self.agent_id}/memory",
+            params
+        )
+    
+    def delete_memory(self, memory_id: str) -> Dict:
+        """Delete a specific memory"""
+        if not self.agent_id:
+            return {"error": "No agent ID set"}
+        return self._make_request("DELETE", f"/v1/agents/{self.agent_id}/memory/{memory_id}")
+    
+    def update_memory(self, memory_id: str, content: str, metadata: Dict = None) -> Dict:
+        """Update a specific memory"""
+        if not self.agent_id:
+            return {"error": "No agent ID set"}
+        
+        data = {"content": content}
+        if metadata:
+            data["metadata"] = metadata
+        
+        return self._make_request(
+            "PUT",
+            f"/v1/agents/{self.agent_id}/memory/{memory_id}",
+            data
+        )
+    
+    # ==================== ENTITY EXTRACTION ====================
+    
+    def extract_and_store_entities(
+        self,
+        text: str,
+        entity_types: List[str] = None
+    ) -> Dict:
+        """
+        Extract entities from text and store in memory.
+        
+        Args:
+            text: Text to extract entities from
+            entity_types: Types of entities to extract (person, organization, location, etc.)
+        
+        Returns:
+            Extracted entities
+        """
+        # Simple entity extraction (can be enhanced with NLP)
+        entities = self._simple_entity_extraction(text, entity_types)
+        
+        # Store entities in memory
+        if entities:
+            self._store_entities(entities)
+        
+        return {"entities": entities}
+    
+    def _simple_entity_extraction(
+        self,
+        text: str,
+        entity_types: List[str] = None
+    ) -> List[Dict]:
+        """Simple regex-based entity extraction"""
+        import re
+        
+        entities = []
+        
+        # Extract code blocks
+        code_blocks = re.findall(r'```(\w+)?\n(.*?)```', text, re.DOTALL)
+        for lang, code in code_blocks:
+            entities.append({
+                "type": "code_block",
+                "value": code[:200],  # Truncate long code
+                "language": lang or "unknown",
+                "length": len(code)
+            })
+        
+        # Extract file paths
+        file_paths = re.findall(r'(/[\w/.-]+)', text)
+        for path in set(file_paths):
+            entities.append({
+                "type": "file_path",
+                "value": path
+            })
+        
+        # Extract URLs
+        urls = re.findall(r'https?://[\w./-]+', text)
+        for url in set(urls):
+            entities.append({
+                "type": "url",
+                "value": url
+            })
+        
+        # Extract commands
+        commands = re.findall(r'\$ ([\w\s|-]+)', text)
+        for cmd in commands:
+            entities.append({
+                "type": "command",
+                "value": cmd.strip()
+            })
+        
+        return entities
+    
+    def _store_entities(self, entities: List[Dict]) -> Dict:
+        """Store extracted entities in memory"""
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        entity_text = "\n".join([
+            f"- [{e['type']}] {e['value']}"
+            for e in entities
+        ])
+        
+        memory_data = {
+            "content": f"Extracted Entities:\n{entity_text}",
+            "memory_type": "archival",
+            "tags": ["entities", "extracted"],
+            "metadata": {
+                "entity_count": len(entities),
+                "entity_types": list(set(e["type"] for e in entities))
+            }
+        }
+        
+        return self._make_request(
+            "POST",
+            f"/v1/agents/{self.agent_id}/memory",
+            memory_data
+        )
+    
+    # ==================== SERVER MANAGEMENT ====================
+    
+    def check_server_health(self) -> Dict:
+        """Check Letta server health"""
+        result = self._make_request("GET", "/v1/health")
+        
+        if "error" in result:
+            logger.error(f"Server health check failed: {result['error']}")
+            return {
+                "status": "unhealthy",
+                "error": result["error"]
+            }
+        
+        logger.info(f"Server health: {result.get('status', 'unknown')}")
+        return {
+            "status": result.get("status", "unknown"),
+            "version": result.get("version", "unknown")
+        }
+    
+    def get_server_stats(self) -> Dict:
+        """Get server statistics"""
+        return self._make_request("GET", "/v1/stats")
+    
+    def get_memory_stats(self) -> Dict:
+        """Get memory statistics for current agent"""
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        return self._make_request(
+            "GET",
+            f"/v1/agents/{self.agent_id}/stats"
+        )
+    
+    # ==================== CROSS-AGENT SEARCH ====================
+    
+    def search_all_agents(
+        self,
+        query: str,
+        limit_per_agent: int = 5
+    ) -> Dict:
+        """
+        Search memories across all agents.
+        
+        Args:
+            query: Search query
+            limit_per_agent: Max results per agent
+        
+        Returns:
+            Results from all agents
+        """
+        all_results = {}
+        
+        agents = self.list_agents()
+        for agent in agents.get("agents", []):
+            agent_id = agent.get("id")
+            agent_name = agent.get("name")
+            
+            # Temporarily set agent_id
+            original_id = self.agent_id
+            self.agent_id = agent_id
+            
+            # Search
+            results = self.search_memories(query, limit=limit_per_agent)
+            if results and "memories" in results:
+                all_results[agent_name] = results["memories"]
+            
+            # Restore original agent_id
+            self.agent_id = original_id
+        
+        return {
+            "query": query,
+            "results": all_results,
+            "total_agents": len(all_results)
+        }
+    
+    # ==================== BACKUP OPERATIONS ====================
+    
+    def backup_memories(self, backup_path: str = None) -> Dict:
+        """
+        Backup all memories to file.
+        
+        Args:
+            backup_path: Path to save backup (default: ~/dotfiles/ai/backups/letta/)
+        
+        Returns:
+            Backup result
+        """
+        if not backup_path:
+            backup_path = os.path.expanduser("~/dotfiles/ai/backups/letta")
+        
+        os.makedirs(backup_path, exist_ok=True)
+        
+        # Get all memories
+        memories = self.get_memories(limit=10000)
+        
+        # Save to file
+        timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+        backup_file = os.path.join(backup_path, f"backup_{self.agent_name}_{timestamp}.json")
+        
+        with open(backup_file, "w") as f:
+            json.dump(memories, f, indent=2)
+        
+        logger.info(f"Backed up memories to {backup_file}")
+        return {
+            "success": True,
+            "backup_file": backup_file,
+            "memory_count": len(memories.get("memories", []))
+        }
+    
+    # ==================== MEMORY BLOCK OPERATIONS ====================
+    
+    def create_block(
+        self,
+        label: str,
+        value: str,
+        description: str = None,
+        limit: int = 5000
+    ) -> Dict:
+        """
+        Create a memory block.
+        
+        Args:
+            label: Unique label for the block
+            value: Content of the block
+            description: Description of the block's purpose
+            limit: Character limit (default 5000)
+        
+        Returns:
+            Created block data
+        """
+        data = {
+            "label": label,
+            "value": value,
+            "limit": limit
+        }
+        if description:
+            data["description"] = description
+        
+        return self._make_request("POST", "/v1/blocks", data)
+    
+    def get_block(self, block_id: str) -> Dict:
+        """Retrieve a memory block by ID"""
+        return self._make_request("GET", f"/v1/blocks/{block_id}")
+    
+    def update_block(
+        self,
+        block_id: str,
+        value: str = None,
+        limit: int = None,
+        description: str = None
+    ) -> Dict:
+        """
+        Update a memory block.
+        
+        Args:
+            block_id: ID of the block to update
+            value: New content (replaces entirely)
+            limit: New character limit
+            description: New description
+        
+        Returns:
+            Updated block data
+        """
+        data = {}
+        if value is not None:
+            data["value"] = value
+        if limit is not None:
+            data["limit"] = limit
+        if description is not None:
+            data["description"] = description
+        
+        return self._make_request("PUT", f"/v1/blocks/{block_id}", data)
+    
+    def delete_block(self, block_id: str) -> Dict:
+        """Delete a memory block"""
+        return self._make_request("DELETE", f"/v1/blocks/{block_id}")
+    
+    def list_blocks(
+        self,
+        label: str = None,
+        label_search: str = None
+    ) -> Dict:
+        """
+        List memory blocks.
+        
+        Args:
+            label: Filter by exact label
+            label_search: Search by label text
+        
+        Returns:
+            List of blocks
+        """
+        params = {}
+        if label:
+            params["label"] = label
+        if label_search:
+            params["label_search"] = label_search
+        
+        return self._make_request("GET", "/v1/blocks", params)
+    
+    def attach_block_to_agent(self, agent_id: str, block_id: str) -> Dict:
+        """Attach a memory block to an agent"""
+        return self._make_request(
+            "POST",
+            f"/v1/agents/{agent_id}/blocks/{block_id}/attach"
+        )
+    
+    def detach_block_from_agent(self, agent_id: str, block_id: str) -> Dict:
+        """Detach a memory block from an agent"""
+        return self._make_request(
+            "POST",
+            f"/v1/agents/{agent_id}/blocks/{block_id}/detach"
+        )
+    
+    def get_agent_blocks(self, agent_id: str = None) -> Dict:
+        """Get all blocks attached to an agent"""
+        agent_id = agent_id or self.agent_id
+        if not agent_id:
+            return {"error": "No agent ID provided"}
+        
+        return self._make_request("GET", f"/v1/agents/{agent_id}/blocks")
+    
+    def get_agent_block_by_label(self, agent_id: str, label: str) -> Dict:
+        """Get a specific block by label for an agent"""
+        return self._make_request(
+            "GET",
+            f"/v1/agents/{agent_id}/blocks/{label}"
+        )
+    
+    def update_agent_block(self, agent_id: str, label: str, new_value: str) -> Dict:
+        """Update an agent's block value by label"""
+        return self._make_request(
+            "PUT",
+            f"/v1/agents/{agent_id}/blocks/{label}",
+            {"value": new_value}
+        )
+    
+    # ==================== CORE MEMORY MANAGEMENT ====================
+    
+    def setup_core_memory_blocks(
+        self,
+        persona_value: str = None,
+        human_value: str = None,
+        additional_blocks: List[Dict] = None
+    ) -> Dict:
+        """
+        Set up standard core memory blocks for an agent.
+        
+        Creates:
+        - persona block: Agent personality
+        - human block: User information
+        - Any additional custom blocks
+        
+        Args:
+            persona_value: Content for persona block
+            human_value: Content for human block  
+            additional_blocks: List of additional block dicts
+        
+        Returns:
+            Setup results
+        """
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        results = {
+            "blocks_created": [],
+            "blocks_attached": [],
+            "errors": []
+        }
+        
+        # Create and attach persona block
+        if persona_value:
+            try:
+                persona_block = self.create_block(
+                    label="persona",
+                    value=persona_value,
+                    description="Agent personality and behavior",
+                    limit=5000
+                )
+                if "id" in persona_block:
+                    self.attach_block_to_agent(self.agent_id, persona_block["id"])
+                    results["blocks_created"].append("persona")
+                    results["blocks_attached"].append("persona")
+            except Exception as e:
+                results["errors"].append(f"Persona block: {e}")
+        
+        # Create and attach human block
+        if human_value:
+            try:
+                human_block = self.create_block(
+                    label="human",
+                    value=human_value,
+                    description="User information and preferences",
+                    limit=5000
+                )
+                if "id" in human_block:
+                    self.attach_block_to_agent(self.agent_id, human_block["id"])
+                    results["blocks_created"].append("human")
+                    results["blocks_attached"].append("human")
+            except Exception as e:
+                results["errors"].append(f"Human block: {e}")
+        
+        # Create additional blocks
+        if additional_blocks:
+            for block_def in additional_blocks:
+                try:
+                    block = self.create_block(**block_def)
+                    if "id" in block:
+                        self.attach_block_to_agent(self.agent_id, block["id"])
+                        results["blocks_created"].append(block_def["label"])
+                        results["blocks_attached"].append(block_def["label"])
+                except Exception as e:
+                    results["errors"].append(f"{block_def.get('label', 'unknown')}: {e}")
+        
+        return results
+
+    # ==================== UTILITY METHODS ====================
+    
+    def auto_save_message(self, role: str, content: str) -> Dict:
+        """Automatically save a single message"""
+        message = {
+            "role": role,
+            "content": content,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        return self.save_conversation([message])
+    
+    def create_memory_from_decision(self, decision: str, context: str) -> Dict:
+        """Create a memory from an important decision"""
+        content = f"""
+IMPORTANT DECISION
+==================
+Decision: {decision}
+Context: {context}
+Timestamp: {datetime.utcnow().isoformat()}
+"""
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        return self._make_request(
+            "POST",
+            f"/v1/agents/{self.agent_id}/memory",
+            {
+                "content": content,
+                "memory_type": "core",
+                "tags": ["decision", "important"]
+            }
+        )
+    
+    def create_memory_from_action_item(
+        self,
+        action_item: str,
+        priority: str = "medium"
+    ) -> Dict:
+        """Create a memory from an action item"""
+        content = f"""
+ACTION ITEM
+===========
+Task: {action_item}
+Priority: {priority}
+Created: {datetime.utcnow().isoformat()}
+Status: pending
+"""
+        if not self.agent_id:
+            self.get_or_create_agent()
+        
+        return self._make_request(
+            "POST",
+            f"/v1/agents/{self.agent_id}/memory",
+            {
+                "content": content,
+                "memory_type": "context",
+                "tags": ["action_item", f"priority_{priority}"]
+            }
+        )
+
+
+# Convenience functions for direct import
+_default_integration = None
+
+
+def get_letta_integration(agent_name: str = None) -> LettaIntegration:
+    """Get or create default Letta integration instance"""
+    global _default_integration
+    if _default_integration is None:
+        _default_integration = LettaIntegration(agent_name=agent_name or "default")
+    return _default_integration
+
+
+def save_conversation(messages: List[Dict], tags: List[str] = None) -> Dict:
+    """Save conversation using default integration"""
+    return get_letta_integration().save_conversation(messages, tags)
+
+
+def search_memories(query: str, limit: int = 10) -> Dict:
+    """Search memories using default integration"""
+    return get_letta_integration().search_memories(query, limit=limit)
+
+
+def check_server_health() -> Dict:
+    """Check server health using default integration"""
+    return get_letta_integration().check_server_health()

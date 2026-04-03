@@ -1,78 +1,179 @@
-# Chezmoi ignore patterns
-# Files matching these patterns will NOT be managed by chezmoi
+# =============================================================================
+# Chezmoi Ignore Patterns
+# =============================================================================
+# Files matching these patterns will NOT be managed by chezmoi.
+# Organized by category for maintainability.
+# =============================================================================
 
-# Python
-**/__pycache__
+# --- Build artifacts & caches -----------------------------------------------
+**/__pycache__/
 **/*.pyc
 **/*.pyo
-**/venv
-**/.venv
-**/env
+**/*.pyd
+**/venv/
+**/.venv/
+**/env/
+**/node_modules/
+**/.npm/
+**/.cache/
+**/dist/
+**/build/
+**/*.egg-info/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
 
-# Node
-**/node_modules
-**/.npm
-**/.cache/yarn
-
-# Git internals
-**/.git
-**/.github/workflows/*.log
-
-# Large binaries and model weights
+# --- Large binaries & AI model weights --------------------------------------
 **/*.bin
 **/*.safetensors
 **/*.gguf
 **/*.onnx
 **/*.h5
 **/*.pkl
+**/*.pt
+**/*.pth
+**/*.ckpt
+**/*.mlmodel
+**/*.pb
 
-# Docker volume data
-**/volumes
-**/_data
+# --- Git internals ----------------------------------------------------------
+**/.git/
+**/.gitattributes
+**/.gitmodules
 
-# IDE
-**/.idea
+# --- Docker & containers ----------------------------------------------------
+**/volumes/
+**/_data/
+**/.docker/
+
+# --- IDE & editor runtime ---------------------------------------------------
+**/.idea/
 **/.vscode/settings.json
-**/.vscode/sync
+**/.vscode/sync/
+**/.vscode/cstate*
+**/.vscode/db-*
+**/*.code-workspace
 
-# OS
+# --- OS junk ----------------------------------------------------------------
 **/.DS_Store
 **/Thumbs.db
+**/desktop.ini
+**/.AppleDouble
+**/._*
 
-# Logs
+# --- Logs & temp files ------------------------------------------------------
 **/*.log
 **/logs/
-
-# Terraform
-**/.terraform
-**/terraform.tfstate
-**/terraform.tfstate.backup
-**/.terraform.lock.hcl
-
-# Chezmoi internals
-**/chezmoistate.boltdb
-
-# HuggingFace cache
-**/.cache/huggingface
-
-# Large AI directories (managed separately via .chezmoiexternal)
-dotfiles-ai/skills/**/models/
-dotfiles-ai/skills/**/weights/
-dotfiles-ai/skills/**/.cache/
-
-# Epstein project data (too large, separate data repo)
-epstein-data/
-
-# Temp files
 **/*.tmp
 **/*.swp
 **/*.swo
 **/*~
+**/*.bak
 
-# Secrets that should be in password manager, not templates
+# --- Terraform & IaC state --------------------------------------------------
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/.terraform.lock.hcl
+
+# --- Chezmoi internals ------------------------------------------------------
+**/chezmoistate.boltdb
+
+# --- HuggingFace / ML caches ------------------------------------------------
+**/.cache/huggingface/
+
+# --- AI model directories (managed separately) ------------------------------
+**/models/
+**/weights/
+
+# --- Runtime-generated data -------------------------------------------------
+dotfiles-ai/backups/
+dotfiles-ai/logs/
+dotfiles-ai/validation_report.json
+dotfiles-ai/system_config.json
+
+# --- Secret files (use age encryption or password manager) -------------------
 **/*.pem
 **/*.key
 **/id_rsa
 **/id_ed25519
+**/id_ecdsa
+**/id_dsa
+**/.bw_credentials
+**/.bw_master_password
+**/.env
+**/.env.*
+**/secrets.json
+**/auth.json
+**/api_keys.*
+**/credentials.*
 key.txt.age
-key.txt.age
+
+# --- Cline / Claude Code runtime data ---------------------------------------
+**/.cline/data/sessions/
+**/.cline/data/tasks/
+**/.cline/data/workspaces/
+**/.cline/data/globalState.json
+**/.cline/data/state/
+**/.cline/data/cache/
+**/.cline/data/settings/
+**/.cline/kanban/
+**/.cline/data/sessions.db*
+**/.cline/ide/*.lock
+
+# --- Codex runtime data -----------------------------------------------------
+**/.codex/logs_*.sqlite*
+**/.codex/state_*.sqlite
+**/.codex/auth.json
+**/.codex/.tmp/
+
+# --- KiloCode runtime data --------------------------------------------------
+**/.kilocode/node_modules/
+**/.kilocode/bun.lock
+**/.kilocode/package-lock.json
+
+# --- OpenCode runtime data --------------------------------------------------
+**/.config/opencode/node_modules/
+**/.config/opencode/bun.lock
+**/.config/opencode/package-lock.json
+
+# --- Windsurf / Codeium runtime data ----------------------------------------
+**/.codeium/windsurf/memories/*.pb
+**/.codeium/windsurf/installation_id
+**/.codeium/windsurf/native_storage_migrations.lock
+**/.codeium/windsurf/code_tracker/
+
+# --- Cursor runtime data ----------------------------------------------------
+**/.cursor/skills/**/__pycache__/
+
+# --- Placeholder files (empty or auto-generated) ----------------------------
+**/agents.md
+
+# --- Epstein project data (too large, separate data repo) -------------------
+epstein-data/
+
+# Cline runtime data (contains API keys in conversation history)
+dotfiles-ai/.cline/data/tasks/
+dotfiles-ai/.cline/data/sessions/
+dotfiles-ai/.cline/data/workspaces/
+dotfiles-ai/.cline/data/settings/
+dotfiles-ai/.cline/data/cache/
+dotfiles-ai/.cline/data/globalState.json
+dotfiles-ai/.cline/kanban/
+dotfiles-ai/.cline/data/sessions.db*
+
+# Codex plugins (may contain API keys)
+private_dot_config/private_codex/
+
+# Cline runtime data (contains API keys in conversation history)
+dotfiles-ai/.cline/data/tasks/
+dotfiles-ai/.cline/data/sessions/
+dotfiles-ai/.cline/data/workspaces/
+dotfiles-ai/.cline/data/settings/
+dotfiles-ai/.cline/data/cache/
+dotfiles-ai/.cline/data/globalState.json
+dotfiles-ai/.cline/kanban/
+dotfiles-ai/.cline/data/sessions.db*
+
+# Codex plugins (may contain API keys)
+private_dot_config/private_codex/

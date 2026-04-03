@@ -1,0 +1,330 @@
+# AutoGen Framework Configuration
+# Configuration for AutoGen framework integration
+
+framework: autogen
+version: "0.2.0"
+
+# Core settings
+core:
+  debug: true
+  verbose: false
+  max_retries: 3
+  timeout: 300
+
+# Memory configuration
+memory:
+  backend: agent_memory
+  config:
+    server_url: ${LETTA_SERVER_URL}
+    api_key: ${LETTA_API_KEY}
+    database_url: ${DATABASE_URL}
+  default_memory_type: "ConversationBufferMemory"
+  memory_types:
+    - ConversationBufferMemory
+    - ConversationSummaryMemory
+    - ConversationKGMemory
+    - CombinedMemory
+
+# LLM providers configuration
+llm_providers:
+  openai:
+    enabled: true
+    api_key: ${OPENAI_API_KEY}
+    model: "gpt-4o"
+    temperature: 0.7
+    max_tokens: 4000
+    timeout: 300
+    retry_attempts: 3
+  
+  anthropic:
+    enabled: true
+    api_key: ${ANTHROPIC_API_KEY}
+    model: "claude-sonnet-4-5"
+    temperature: 0.7
+    max_tokens: 100000
+    timeout: 600
+    retry_attempts: 3
+  
+  google:
+    enabled: true
+    api_key: ${GOOGLE_AI_API_KEY}
+    model: "gemini-pro"
+    temperature: 0.7
+    max_tokens: 32000
+    timeout: 600
+    retry_attempts: 2
+  
+  azure:
+    enabled: false
+    api_key: ${AZURE_OPENAI_API_KEY}
+    api_base: ${AZURE_OPENAI_ENDPOINT}
+    deployment_name: "gpt-4"
+    api_version: "2023-05-15"
+    temperature: 0.7
+    max_tokens: 4000
+
+# Agent configuration
+agents:
+  assistant:
+    name: "assistant"
+    system_message: "You are a helpful AI assistant."
+    llm_config:
+      config_list:
+        - model: "gpt-4o"
+          api_key: ${OPENAI_API_KEY}
+      temperature: 0.7
+      max_tokens: 4000
+    human_input_mode: "NEVER"
+    max_consecutive_auto_reply: 10
+    memory_config:
+      type: "letta"
+      server_url: "http://localhost:8283"
+      api_key: "${LETTA_API_KEY}"
+  
+  user_proxy:
+    name: "user_proxy"
+    system_message: "You are a user proxy agent."
+    llm_config: null
+    human_input_mode: "ALWAYS"
+    max_consecutive_auto_reply: 0
+    memory_config: null
+  
+  researcher:
+    name: "researcher"
+    system_message: "You are a research specialist. Conduct thorough research and gather information."
+    llm_config:
+      config_list:
+        - model: "gpt-4o"
+          api_key: ${OPENAI_API_KEY}
+      temperature: 0.7
+      max_tokens: 4000
+    human_input_mode: "NEVER"
+    max_consecutive_auto_reply: 15
+    memory_config:
+      type: "letta"
+      server_url: "http://localhost:8283"
+      api_key: "${LETTA_API_KEY}"
+    function_map:
+      web_search: "web_search"
+      search: "search"
+      file_system: "file_system"
+  
+  developer:
+    name: "developer"
+    system_message: "You are a development specialist. Write high-quality code and implement solutions."
+    llm_config:
+      config_list:
+        - model: "gpt-4o"
+          api_key: ${OPENAI_API_KEY}
+      temperature: 0.7
+      max_tokens: 4000
+    human_input_mode: "NEVER"
+    max_consecutive_auto_reply: 10
+    memory_config:
+      type: "letta"
+      server_url: "http://localhost:8283"
+      api_key: "${LETTA_API_KEY}"
+    function_map:
+      file_system: "file_system"
+      terminal: "terminal"
+      search: "search"
+  
+  analyst:
+    name: "analyst"
+    system_message: "You are a data analysis specialist. Analyze data and provide insights."
+    llm_config:
+      config_list:
+        - model: "gpt-4o"
+          api_key: ${OPENAI_API_KEY}
+      temperature: 0.7
+      max_tokens: 4000
+    human_input_mode: "NEVER"
+    max_consecutive_auto_reply: 12
+    memory_config:
+      type: "letta"
+      server_url: "http://localhost:8283"
+      api_key: "${LETTA_API_KEY}"
+    function_map:
+      data_tools: "data_tools"
+      analysis_tools: "analysis_tools"
+
+# Group chat configuration
+group_chats:
+  default:
+    agents: ["user_proxy", "assistant"]
+    max_round: 10
+    speaker_selection_method: "round_robin"
+    allow_remembering: true
+    remember_length: 10
+    memory_config:
+      type: "letta"
+      server_url: "http://localhost:8283"
+      api_key: "${LETTA_API_KEY}"
+  
+  research_chat:
+    agents: ["user_proxy", "researcher", "analyst"]
+    max_round: 15
+    speaker_selection_method: "auto"
+    allow_remembering: true
+    remember_length: 15
+    memory_config:
+      type: "letta"
+      server_url: "http://localhost:8283"
+      api_key: "${LETTA_API_KEY}"
+  
+  development_chat:
+    agents: ["user_proxy", "developer", "analyst"]
+    max_round: 12
+    speaker_selection_method: "auto"
+    allow_remembering: true
+    remember_length: 12
+    memory_config:
+      type: "letta"
+      server_url: "http://localhost:8283"
+      api_key: "${LETTA_API_KEY}"
+
+# Function calling configuration
+function_calling:
+  enabled: true
+  max_calls_per_round: 5
+  timeout: 300
+  retry_attempts: 3
+
+# Tools configuration
+tools:
+  file_system:
+    enabled: true
+    allowed_paths:
+      - /home/cbwinslow/workspace
+      - /home/cbwinslow/dotfiles
+      - /home/cbwinslow/docs
+    blocked_commands:
+      - rm -rf /
+      - sudo
+      - chmod 777
+  
+  web_search:
+    enabled: true
+    max_results: 10
+    timeout: 30
+  
+  terminal:
+    enabled: true
+    allowed_commands:
+      - git
+      - ls
+      - cat
+      - grep
+      - find
+    blocked_commands:
+      - rm
+      - sudo
+      - chmod
+  
+  search:
+    enabled: true
+    search_engines:
+      - google
+      - bing
+    max_results: 5
+
+# Callbacks configuration
+callbacks:
+  enabled: true
+  handlers:
+    - "StdOutCallbackHandler"
+    - "FileCallbackHandler"
+  file_callback:
+    file_path: "/home/cbwinslow/dotfiles/ai/frameworks/autogen/logs/callbacks.log"
+
+# Embeddings configuration
+embeddings:
+  openai:
+    enabled: true
+    model: "text-embedding-ada-002"
+    api_key: ${OPENAI_API_KEY}
+  
+  huggingface:
+    enabled: false
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+
+# Vector stores configuration
+vector_stores:
+  chroma:
+    enabled: true
+    persist_directory: "/home/cbwinslow/dotfiles/ai/frameworks/autogen/vector_stores/chroma"
+    collection_name: "autogen_docs"
+  
+  faiss:
+    enabled: false
+    index_path: "/home/cbwinslow/dotfiles/ai/frameworks/autogen/vector_stores/faiss.index"
+  
+  pgvector:
+    enabled: true
+    connection_string: ${DATABASE_URL}
+    collection_name: "autogen_vectors"
+
+# Document loaders configuration
+document_loaders:
+  text:
+    enabled: true
+    file_extensions: [".txt", ".md", ".rst"]
+  pdf:
+    enabled: true
+    extract_images: false
+  html:
+    enabled: true
+    bs_kwargs:
+      parse_only: "div"
+  web:
+    enabled: true
+    max_depth: 2
+    allowed_domains: ["github.com", "stackoverflow.com"]
+
+# Prompt templates configuration
+prompt_templates:
+  default:
+    template: "You are a helpful AI assistant. Answer the question based on the context provided."
+  research:
+    template: "You are a research assistant. Provide detailed, well-cited answers with sources."
+  code:
+    template: "You are a code expert. Provide clear, efficient, and well-documented code solutions."
+
+# Environment-specific overrides
+environments:
+  development:
+    debug: true
+    log_level: "DEBUG"
+    memory_ttl_days: 7
+    vector_store: "chroma"
+  
+  production:
+    debug: false
+    log_level: "INFO"
+    memory_ttl_days: 90
+    vector_store: "pgvector"
+    max_concurrent_requests: 10
+
+# Integration settings
+integrations:
+  agent_memory:
+    enabled: true
+    package_path: "/home/cbwinslow/dotfiles/ai/packages/agent_memory"
+    auto_sync: true
+    sync_interval: 300  # seconds
+  
+  letta:
+    enabled: true
+    server_url: "http://localhost:8283"
+    api_key: ${LETTA_API_KEY}
+    auto_sync: true
+    sync_interval: 600  # seconds
+
+# Performance settings
+performance:
+  max_concurrent_requests: 5
+  request_timeout: 300
+  retry_delay: 1
+  max_retry_delay: 60
+  enable_caching: true
+  cache_ttl: 3600  # seconds

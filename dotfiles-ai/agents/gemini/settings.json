@@ -1,0 +1,14 @@
+{
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "general": {
+    "defaultApprovalMode": "auto_edit"
+  },
+  "ui": {
+    "inlineThinkingMode": "full",
+    "hideTips": true
+  }
+}

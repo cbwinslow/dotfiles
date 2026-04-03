@@ -1,0 +1,87 @@
+# Gemini Agent Configuration
+# Location: ~/dotfiles/ai/agents/gemini/config.yaml
+# Inherits from: ~/dotfiles/ai/base/base_agent.yaml
+
+# ★ Shared Resources - Centralized for all agents ★
+shared_resources:
+  skills_path: ~/dotfiles/ai/shared/skills
+  tools_path: ~/dotfiles/ai/shared/tools
+  scripts_path: ~/dotfiles/ai/shared/scripts
+  mcp_servers_path: ~/dotfiles/ai/shared/mcp
+  docs_path: ~/dotfiles/ai/shared/docs
+
+# Agent-specific settings (overrides base config)
+extends: ../../base/base_agent.yaml
+
+name: gemini_agent
+framework: langchain
+
+# All available tools (agents can override in their specific config)
+tools:
+  # Core tools
+  - file_system
+  - terminal
+  - search
+  - web_fetch
+  # CBW RAG tools
+  - cbw_rag.semantic_search
+  - cbw_rag.find_duplicates
+  - cbw_rag.similar_code
+  - cbw_rag.index_files
+  # Letta memory tools
+  - letta_server.store_conversation
+  - letta_server.search_memories
+  - letta_server.get_memory_stats
+  - letta_server.check_server_health
+  - letta_server.setup_agent_memory
+  - letta_server.sync_agent_context
+
+# All available skills (agents can override in their specific config)
+skills:
+  - memory_management
+  - cli_operations
+  - conversation_logging
+  - memory_sync
+  - entity_extraction
+  - cross_agent_search
+  - server_health
+  - bitwarden_secrets
+  - cbw_rag_query
+  - cbw_find_duplicates
+  - cbw_similar_code
+  - research
+  - analysis
+  - documentation
+  - web_search
+  - data_processing
+
+# Context settings for Gemini (supports larger context)
+context:
+  max_context_length: 32000
+  auto_save_interval: 600
+
+# Processing settings for research tasks
+processing:
+  max_concurrent_tasks: 3
+  timeout_seconds: 600
+  batch_size: 5
+
+# Behavior settings for Gemini
+behavior:
+  max_iterations: 15
+  allow_self_modification: true
+  require_approval: true
+
+# Research settings
+research:
+  max_search_results: 10
+  search_depth: 3
+  citation_required: true
+  fact_checking: true
+
+# Security settings specific to Gemini
+security:
+  allowed_paths:
+    - /home/cbwinslow/workspace
+    - /home/cbwinslow/dotfiles
+    - /home/cbwinslow/research

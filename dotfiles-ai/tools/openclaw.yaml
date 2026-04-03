@@ -1,0 +1,381 @@
+# OpenClaw Configuration
+# Self-hosted autonomous AI butler with comprehensive provider support
+# Updated: Full free model provider setup + Tailscale + Memory
+
+# Default model configuration
+model: "openrouter/qwen/qwen2.5-coder:free"
+provider: "openrouter"
+
+# =============================================================================
+# PROVIDER CONFIGURATIONS - Free Tier Focused
+# =============================================================================
+
+# OpenRouter - Primary provider for free/discounted models
+openrouter:
+  api_key_env: "OPENROUTER_API_KEY"
+  base_url: "https://openrouter.ai/api/v1"
+  # Free models available on OpenRouter
+  free_models:
+    - "qwen/qwen2.5-coder:free"
+    - "deepseek/deepseek-chat:free"
+    - "deepseek/deepseek-coder:free"
+    - "meta-llama/llama-3.1-8b-instruct:free"
+    - "meta-llama/llama-3.2-1b-instruct:free"
+    - "mistralai/mistral-7b-instruct:free"
+    - "nousresearch/hermes-3-llama-3.1-405b:free"
+    - "google/gemini-flash-1.5:free"
+    - "anthropic/claude-3.5-haiku:free"
+    - "anthropic/claude-3-haiku:free"
+
+# Google Gemini - Direct API (free tier: 1,500 requests/day)
+gemini:
+  api_key_env: "GEMINI_API_KEY"
+  base_url: "https://generativelanguage.googleapis.com/v1beta"
+  models:
+    - "gemini-2.5-flash"
+    - "gemini-2.0-flash"
+    - "gemini-1.5-flash"
+    - "gemini-1.5-flash-8b"
+
+# Groq - Fast inference (free tier: 100K tokens/min, 1M tokens/day)
+groq:
+  api_key_env: "GROQ_API_KEY"
+  base_url: "https://api.groq.com/openai/v1"
+  models:
+    - "llama-3.1-8b-instant"
+    - "llama-3.1-70b-versatile"
+    - "llama-3.2-1b-preview"
+    - "llama-3.2-3b-preview"
+    - "mixtral-8x7b-32768"
+    - "gemma-7b-it"
+    - "gemma2-9b-it"
+
+# Ollama - Local models (free, runs locally)
+ollama:
+  base_url: "http://localhost:11434"
+  models:
+    - "qwen2.5-coder:14b"
+    - "qwen2.5-coder:7b"
+    - "llama3.1:8b"
+    - "llama3.2:1b"
+    - "mistral:7b"
+    - "codellama:7b"
+    - "deepseek-coder:6.7b"
+    - "phi4:14b"
+    - "phi3:3.8b"
+    - "nomic-embed-text:latest"
+    - "mxbai-embed-large:latest"
+
+# Kilocode - Via OpenRouter
+kilocode:
+  api_key_env: "OPENROUTER_API_KEY"
+  base_url: "https://openrouter.ai/api/v1"
+
+# OpenCode - Via OpenRouter  
+opencode:
+  api_key_env: "OPENROUTER_API_KEY"
+  base_url: "https://openrouter.ai/api/v1"
+
+# Cline - Via OpenRouter
+cline:
+  api_key_env: "OPENROUTER_API_KEY"
+  base_url: "https://openrouter.ai/api/v1"
+
+# Qwen - Via OpenRouter or direct
+qwen:
+  api_key_env: "OPENROUTER_API_KEY"
+  base_url: "https://openrouter.ai/api/v1"
+
+# OpenAI (kept for compatibility)
+openai:
+  api_key_env: "OPENAI_API_KEY"
+  models:
+    - "gpt-4.1-mini"
+    - "gpt-4.1-nano"
+
+# Anthropic (kept for compatibility)
+anthropic:
+  api_key_env: "ANTHROPIC_API_KEY"
+  models:
+    - "claude-3-5-haiku-latest"
+
+# =============================================================================
+# SKILLS & WORKFLOWS
+# =============================================================================
+
+skills_dir: "~/.openclaw/skills"
+auto_load_skills: true
+
+workflows_dir: "~/.config/ai/workflows"
+auto_load_workflows: true
+
+# =============================================================================
+# AGENTS CONFIGURATION
+# =============================================================================
+
+agents_dir: "~/.config/ai/agents"
+default_agent: "ops"
+
+# =============================================================================
+# MEMORY CONFIGURATION - Letta Server + Embeddings + Vector Search
+# =============================================================================
+
+memory:
+  backend: "letta_server"
+  server_url: "${LETTA_SERVER_URL:-http://localhost:8283}"
+  auto_save: true
+  auto_load: true
+  
+  # Embedding configuration for semantic search
+  embedding:
+    provider: "ollama"  # Use local Ollama for embeddings (free)
+    model: "nomic-embed-text:latest"
+    ollama_url: "http://localhost:11434"
+    # Alternative: use OpenRouter for API-based embeddings
+    # provider: "openrouter"
+    # model: "sentence-transformers/all-MiniLM-L6-v2"
+    
+  # Vector database for RAG
+  vector_store:
+    type: "chroma"  # or "qdrant"
+    persist_directory: "~/.openclaw/memory/vectors"
+    
+  # Semantic search settings
+  search:
+    enabled: true
+    top_k: 10
+    similarity_threshold: 0.7
+    include_metadata: true
+    search_memory: true
+    search_knowledge: true
+    search_conversations: true
+
+# =============================================================================
+# TAILSCALE CONFIGURATION - LAN + Web Access
+# =============================================================================
+
+tailscale:
+  enabled: true
+  mode: "serve"  # "serve" = tailnet-only, "funnel" = public
+  
+  # Serve configuration (tailnet access)
+  serve:
+    enabled: true
+    funnel: false
+    allow_tailscale_auth: true
+  
+  # Funnel configuration (public internet access - disabled by default)
+  funnel:
+    enabled: false
+    require_password: true
+  
+  # Trusted networks
+  trusted_proxies:
+    - "127.0.0.1"
+    - "::1"
+    - "100.64.0.0/10"  # Tailscale CGNAT
+    - "192.168.0.0/16"  # LAN
+    - "10.0.0.0/8"      # Private networks
+
+# =============================================================================
+# GATEWAY CONFIGURATION - LAN + Tailscale Access
+# =============================================================================
+
+gateway:
+  port: 18789
+  bind: "lan"  # Options: loopback, lan, tailnet, 0.0.0.0
+  
+  control_ui:
+    enabled: true
+    allowed_origins:
+      - "http://localhost:18789"
+      - "http://127.0.0.1:18789"
+      - "https://*.ts.net"
+      - "http://192.168.*"
+      - "http://100.64.*"
+  
+  auth:
+    mode: "token"
+    allow_tailscale: true
+  
+  trusted_proxies:
+    - "127.0.0.1"
+    - "::1"
+    - "100.64.0.0/10"
+    - "192.168.0.0/16"
+
+# =============================================================================
+# MESSAGING & CHANNELS
+# =============================================================================
+
+messaging:
+  # Example: Telegram bot
+  telegram:
+    enabled: false
+    bot_token: "${TELEGRAM_BOT_TOKEN}"
+  
+  # Example: Signal
+  signal:
+    enabled: false
+    # Signal CLI configuration
+
+# Browser automation
+browser:
+  enabled: true
+  headless: true
+  # Playwright configuration
+
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
+
+security:
+  # Require confirmation for destructive actions
+  confirm_destructive: true
+  
+  # Allowed paths for file operations
+  allowed_paths:
+    - "/home/cbwinslow/workspace"
+    - "/home/cbwinslow/dotfiles"
+    - "/home/cbwinslow/infra"
+    - "/home/cbwinslow/projects"
+    - "/home/cbwinslow/.openclaw"
+    - "/home/cbwinslow/.config/ai"
+  
+  # Blocked commands
+  blocked_commands:
+    - "rm -rf /"
+    - "sudo rm"
+    - "chmod 777 /"
+    - "mkfs."
+    - "dd if=/dev/zero"
+  
+  # Gateway security
+  gateway_security:
+    require_auth_for_local: false
+    max_failed_attempts: 5
+    lockout_duration: 300
+
+# =============================================================================
+# LOGGING & DIAGNOSTICS
+# =============================================================================
+
+logging:
+  level: "info"
+  dir: "~/.local/state/ai/logs/openclaw"
+  
+  diagnostics:
+    enabled: true
+    otel:
+      enabled: false
+
+# =============================================================================
+# MCP SERVERS - Model Context Protocol
+# =============================================================================
+
+mcp_servers:
+  # Bitwarden for secure credential access
+  bitwarden:
+    command: "npx"
+    args: ["-y", "@bitwarden/mcp-server"]
+    env:
+      BW_SESSION: "${BW_SESSION}"
+    enabled: true
+  
+  # Filesystem access
+  filesystem:
+    command: "python3"
+    args: ["~/.config/ai/shared/mcp/filesystem_server.py"]
+    enabled: true
+  
+  # Custom RAG server for embeddings search
+  cbw_rag:
+    command: "python3"
+    args: ["~/.config/ai/shared/mcp/rag_server.py"]
+    env:
+      CBW_RAG_DATABASE: "${CBW_RAG_DATABASE:-~/.openclaw/rag/embeddings.db}"
+    enabled: true
+  
+  # Brave Search (enable when you have API key)
+  brave_search:
+    command: "npx"
+    args: ["-y", "@brave-search/mcp"]
+    env:
+      BRAVE_API_KEY: "${BRAVE_API_KEY}"
+    enabled: true
+  
+  # GitHub MCP (enable when you have token)
+  github:
+    command: "npx"
+    args: ["-y", "@github/mcp-server"]
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+    enabled: true
+  
+  # Sequential Thinking for complex reasoning
+  sequential_thinking:
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    enabled: true
+  
+  # Puppeteer for browser automation
+  puppeteer:
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-puppeteer"]
+    enabled: true
+
+# =============================================================================
+# EXTENSIONS & PLUGINS
+# =============================================================================
+
+extensions:
+  auto_load: true
+  directories:
+    - "~/.openclaw/extensions"
+    - "~/.config/ai/extensions"
+
+plugins:
+  # Official OpenClaw plugins to load
+  official:
+    - "anthropic"
+    - "openai"
+    - "bedrock"
+    - "openrouter"
+    - "memory"
+    - "mcp"
+  
+  # Custom/community plugins
+  custom: []
+
+# =============================================================================
+# MODEL FALLBACKS & COST OPTIMIZATION
+# =============================================================================
+
+models:
+  # Fallback chain when primary fails
+  fallback_chain:
+    - "openrouter/qwen/qwen2.5-coder:free"
+    - "openrouter/deepseek/deepseek-coder:free"
+    - "groq/llama-3.1-8b-instant"
+    - "gemini/gemini-2.5-flash"
+    - "ollama/qwen2.5-coder:14b"
+  
+  # Cost optimization - prefer free tiers
+  cost_optimization:
+    enabled: true
+    prefer_free: true
+    max_cost_per_1k_tokens: 0.01
+
+# =============================================================================
+# AUTO-UPDATE & MAINTENANCE
+# =============================================================================
+
+update:
+  channel: "stable"
+  auto_check: true
+  
+maintenance:
+  auto_cleanup: true
+  log_retention_days: 30
+  session_retention_days: 7
+

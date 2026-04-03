@@ -1,0 +1,36 @@
+{
+  "topic": "docker compose",
+  "sources": {
+    "web": {
+      "searches_performed": [
+        "docker compose documentation",
+        "docker compose tutorial getting started",
+        "docker compose official docs"
+      ],
+      "files_created": [
+        "/home/cbwinslow/dotfiles/ai/docs/fetched/docker_compose/web_docker_compose_documentation.md",
+        "/home/cbwinslow/dotfiles/ai/docs/fetched/docker_compose/web_docker_compose_tutorial_getting_started.md",
+        "/home/cbwinslow/dotfiles/ai/docs/fetched/docker_compose/web_docker_compose_official_docs.md"
+      ]
+    },
+    "github": {
+      "repos_found": [],
+      "files_created": [
+        "/home/cbwinslow/dotfiles/ai/docs/fetched/docker_compose/github_repos.md"
+      ]
+    },
+    "package": {
+      "packages_checked": [
+        "docker-compose"
+      ],
+      "files_created": [
+        "/home/cbwinslow/dotfiles/ai/docs/fetched/docker_compose/package_docs.md"
+      ]
+    }
+  },
+  "output_files": [
+    "/home/cbwinslow/dotfiles/ai/docs/fetched/docker_compose/INDEX.md"
+  ],
+  "timestamp": "2026-03-31T17:10:03.979184",
+  "index_file": "/home/cbwinslow/dotfiles/ai/docs/fetched/docker_compose/INDEX.md"
+}

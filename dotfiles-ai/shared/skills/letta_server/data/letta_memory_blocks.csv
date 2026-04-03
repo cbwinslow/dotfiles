@@ -1,0 +1,65 @@
+id,label,content,description,created_at,updated_at
+1,project_context,"
+        Epstein Files Analysis Project - Comprehensive investigation of Jeffrey Epstein case documents.
+        Processing 268K+ PDFs with OCR and NER for entity extraction and knowledge graph building.
+        PostgreSQL database with 1.39M documents, specialized analysis databases, and cross-referencing.
+        ",Core project context for all agents,2026-03-23 03:27:34.872896,2026-03-23 03:27:34.872896
+2,processing_pipeline,"
+        1. Download datasets from DOJ website using epstein-ripper
+        2. OCR extraction: PyMuPDF (text layer) + Surya (scanned pages) + Docling (fallback)
+        3. Entity extraction: spaCy NER + GLiNER + regex patterns
+        4. Storage: PostgreSQL with FTS5 search and pgvector embeddings
+        5. Knowledge graph: Entity relationships and co-occurrence analysis
+        6. Cross-referencing: Integration with pre-built databases
+        ",Standard processing workflow,2026-03-23 03:27:34.90487,2026-03-23 03:27:34.90487
+3,database_schema,"
+        Core Tables:
+        - documents: Document metadata (efta_number, dataset, file_path, etc.)
+        - entities: Named entities with source references
+        - documents_content: OCR text and processing metadata
+        - relationships: Entity relationships
+        - letta_memories: Project knowledge and context
+        
+        Pre-built Databases:
+        - full_text_corpus.db: 1.4M docs with FTS5 search
+        - redaction_analysis_v2.db: 2.59M redactions
+        - image_analysis.db: 38K image descriptions
+        - communications.db: 41K emails and communication pairs
+        - transcripts.db: 1.6K media transcriptions
+        - knowledge_graph.db: 606 entities, 2.3K relationships
+        ",Database structure and schema,2026-03-23 03:27:34.94043,2026-03-23 03:27:34.94043
+4,verification_workflow,"
+        File Registry Verification Workflow:
+        
+        1. SCAN: Recursively scan target directories for files
+        2. HASH: Compute SHA-256 hash for each file (parallel processing)
+        3. VALIDATE: Check PDF headers, file sizes, naming patterns
+        4. EXTRACT: Parse EFTA numbers from filenames
+        5. STORE: Batch insert into PostgreSQL file_registry table
+        6. CROSS-REFERENCE: Compare with documents table
+        7. REPORT: Generate JSON/CSV reports with statistics
+        8. ALERT: Flag issues for review (missing files, duplicates)
+        
+        Automation: Can be scheduled via cron for regular verification
+        ",Standard workflow for file integrity verification,2026-03-23 14:33:23.144148,2026-03-23 14:33:23.144148
+5,known_data_issues,"
+        Known Data Issues (Expected & Documented):
+        
+        1. Dataset 99: 4,930 documents with relative paths
+           - Not in raw-files directory
+           - Likely from supplementary sources
+        
+        2. Missing Files: Expected for datasets 9-12
+           - Downloads still in progress
+           - 94% overall coverage (1.3M of 1.4M files)
+        
+        3. Duplicate file_paths: 467 instances
+           - Same file referenced by multiple EFTA numbers
+           - Intentional: documents pointing to shared source files
+        
+        4. Non-PDF Files: ~120 aria2 control files
+           - Automatically excluded from processing
+           - Should be cleaned up eventually
+        
+        All issues are tracked in file_registry_report_*.json files
+        ",Documented data quality issues and expected gaps,2026-03-23 14:33:23.17057,2026-03-23 14:33:23.17057

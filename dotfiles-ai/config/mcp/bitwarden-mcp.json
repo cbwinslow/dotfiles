@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "bitwarden": {
+      "command": "npx",
+      "args": ["-y", "@bitwarden/mcp-server"],
+      "env": {
+        "BW_SESSION": "${BW_SESSION}"
+      }
+    }
+  }
+}

@@ -1,0 +1,312 @@
+# CrewAI Framework Configuration
+# Configuration for CrewAI framework integration
+
+framework: crewai
+version: "0.30.0"
+
+# Core settings
+core:
+  debug: true
+  verbose: false
+  max_retries: 3
+  timeout: 300
+
+# Memory configuration
+memory:
+  backend: agent_memory
+  config:
+    server_url: ${LETTA_SERVER_URL}
+    api_key: ${LETTA_API_KEY}
+    database_url: ${DATABASE_URL}
+  default_memory_type: "ConversationBufferMemory"
+  memory_types:
+    - ConversationBufferMemory
+    - ConversationSummaryMemory
+    - ConversationKGMemory
+    - CombinedMemory
+
+# LLM providers configuration
+llm_providers:
+  openai:
+    enabled: true
+    api_key: ${OPENAI_API_KEY}
+    model: "gpt-4o"
+    temperature: 0.7
+    max_tokens: 4000
+    timeout: 300
+    retry_attempts: 3
+  
+  anthropic:
+    enabled: true
+    api_key: ${ANTHROPIC_API_KEY}
+    model: "claude-sonnet-4-5"
+    temperature: 0.7
+    max_tokens: 100000
+    timeout: 600
+    retry_attempts: 3
+  
+  google:
+    enabled: true
+    api_key: ${GOOGLE_AI_API_KEY}
+    model: "gemini-pro"
+    temperature: 0.7
+    max_tokens: 32000
+    timeout: 600
+    retry_attempts: 2
+  
+  azure:
+    enabled: false
+    api_key: ${AZURE_OPENAI_API_KEY}
+    api_base: ${AZURE_OPENAI_ENDPOINT}
+    deployment_name: "gpt-4"
+    api_version: "2023-05-15"
+    temperature: 0.7
+    max_tokens: 4000
+
+# Agent configuration
+agents:
+  default:
+    role: "Default Agent"
+    goal: "Complete assigned tasks efficiently"
+    backstory: "A versatile AI agent capable of handling various tasks"
+    memory_backend: "agent_memory"
+    verbose: true
+    max_iter: 25
+    allow_delegation: true
+  
+  researcher:
+    role: "Research Specialist"
+    goal: "Conduct thorough research and gather information"
+    backstory: "Expert in information gathering and analysis"
+    memory_backend: "agent_memory"
+    verbose: true
+    max_iter: 30
+    allow_delegation: true
+    tools: ["web_search", "search", "file_system"]
+  
+  developer:
+    role: "Development Specialist"
+    goal: "Write high-quality code and implement solutions"
+    backstory: "Experienced software developer with expertise in multiple languages"
+    memory_backend: "agent_memory"
+    verbose: true
+    max_iter: 20
+    allow_delegation: false
+    tools: ["file_system", "terminal", "search"]
+  
+  analyst:
+    role: "Data Analysis Specialist"
+    goal: "Analyze data and provide insights"
+    backstory: "Data scientist with strong analytical skills"
+    memory_backend: "agent_memory"
+    verbose: true
+    max_iter: 25
+    allow_delegation: true
+    tools: ["data_tools", "analysis_tools"]
+
+# Task configuration
+tasks:
+  default:
+    expected_output: "Clear, actionable results"
+    human_input: false
+    async_execution: false
+    context: []
+  
+  research:
+    expected_output: "Comprehensive research findings with sources"
+    human_input: false
+    async_execution: true
+    context: ["researcher"]
+  
+  development:
+    expected_output: "Working code implementation with documentation"
+    human_input: false
+    async_execution: false
+    context: ["developer"]
+  
+  analysis:
+    expected_output: "Detailed analysis with visualizations and recommendations"
+    human_input: false
+    async_execution: true
+    context: ["analyst"]
+
+# Crew configuration
+crews:
+  default:
+    process: "sequential"
+    memory: true
+    cache: true
+    verbose: 2
+    full_output: false
+    share_crew: false
+    manager_llm: "gpt-4o"
+    function_calling_llm: "gpt-4o"
+    max_rpm: 100
+    max_tokens_for_tasks: 4000
+    step_callback: null
+    task_callback: null
+  
+  research_crew:
+    process: "sequential"
+    memory: true
+    cache: true
+    verbose: 2
+    full_output: true
+    share_crew: true
+    manager_llm: "gpt-4o"
+    function_calling_llm: "gpt-4o"
+    max_rpm: 100
+    max_tokens_for_tasks: 4000
+    agents: ["researcher", "analyst"]
+  
+  development_crew:
+    process: "hierarchical"
+    memory: true
+    cache: true
+    verbose: 2
+    full_output: true
+    share_crew: true
+    manager_llm: "gpt-4o"
+    function_calling_llm: "gpt-4o"
+    max_rpm: 100
+    max_tokens_for_tasks: 4000
+    agents: ["developer", "analyst"]
+
+# Tools configuration
+tools:
+  file_system:
+    enabled: true
+    allowed_paths:
+      - /home/cbwinslow/workspace
+      - /home/cbwinslow/dotfiles
+      - /home/cbwinslow/docs
+    blocked_commands:
+      - rm -rf /
+      - sudo
+      - chmod 777
+  
+  web_search:
+    enabled: true
+    max_results: 10
+    timeout: 30
+  
+  terminal:
+    enabled: true
+    allowed_commands:
+      - git
+      - ls
+      - cat
+      - grep
+      - find
+    blocked_commands:
+      - rm
+      - sudo
+      - chmod
+  
+  search:
+    enabled: true
+    search_engines:
+      - google
+      - bing
+    max_results: 5
+
+# Callbacks configuration
+callbacks:
+  enabled: true
+  handlers:
+    - "StdOutCallbackHandler"
+    - "FileCallbackHandler"
+  file_callback:
+    file_path: "/home/cbwinslow/dotfiles/ai/frameworks/crewai/logs/callbacks.log"
+
+# Embeddings configuration
+embeddings:
+  openai:
+    enabled: true
+    model: "text-embedding-ada-002"
+    api_key: ${OPENAI_API_KEY}
+  
+  huggingface:
+    enabled: false
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+
+# Vector stores configuration
+vector_stores:
+  chroma:
+    enabled: true
+    persist_directory: "/home/cbwinslow/dotfiles/ai/frameworks/crewai/vector_stores/chroma"
+    collection_name: "crewai_docs"
+  
+  faiss:
+    enabled: false
+    index_path: "/home/cbwinslow/dotfiles/ai/frameworks/crewai/vector_stores/faiss.index"
+  
+  pgvector:
+    enabled: true
+    connection_string: ${DATABASE_URL}
+    collection_name: "crewai_vectors"
+
+# Document loaders configuration
+document_loaders:
+  text:
+    enabled: true
+    file_extensions: [".txt", ".md", ".rst"]
+  pdf:
+    enabled: true
+    extract_images: false
+  html:
+    enabled: true
+    bs_kwargs:
+      parse_only: "div"
+  web:
+    enabled: true
+    max_depth: 2
+    allowed_domains: ["github.com", "stackoverflow.com"]
+
+# Prompt templates configuration
+prompt_templates:
+  default:
+    template: "You are a helpful AI assistant. Answer the question based on the context provided."
+  research:
+    template: "You are a research assistant. Provide detailed, well-cited answers with sources."
+  code:
+    template: "You are a code expert. Provide clear, efficient, and well-documented code solutions."
+
+# Environment-specific overrides
+environments:
+  development:
+    debug: true
+    log_level: "DEBUG"
+    memory_ttl_days: 7
+    vector_store: "chroma"
+  
+  production:
+    debug: false
+    log_level: "INFO"
+    memory_ttl_days: 90
+    vector_store: "pgvector"
+    max_concurrent_requests: 10
+
+# Integration settings
+integrations:
+  agent_memory:
+    enabled: true
+    package_path: "/home/cbwinslow/dotfiles/ai/packages/agent_memory"
+    auto_sync: true
+    sync_interval: 300  # seconds
+  
+  letta:
+    enabled: true
+    server_url: "http://localhost:8283"
+    api_key: ${LETTA_API_KEY}
+    auto_sync: true
+    sync_interval: 600  # seconds
+
+# Performance settings
+performance:
+  max_concurrent_requests: 5
+  request_timeout: 300
+  retry_delay: 1
+  max_retry_delay: 60
+  enable_caching: true
+  cache_ttl: 3600  # seconds

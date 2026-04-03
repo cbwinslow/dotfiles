@@ -1,0 +1,238 @@
+# LangChain Framework Configuration
+# Configuration for LangChain framework integration
+
+framework: langchain
+version: "0.2.0"
+
+# Core settings
+core:
+  debug: true
+  verbose: false
+  max_retries: 3
+  timeout: 300
+
+# Memory configuration
+memory:
+  backend: agent_memory
+  config:
+    server_url: ${LETTA_SERVER_URL}
+    api_key: ${LETTA_API_KEY}
+    database_url: ${DATABASE_URL}
+  default_memory_type: "ConversationBufferMemory"
+  memory_types:
+    - ConversationBufferMemory
+    - ConversationSummaryMemory
+    - ConversationKGMemory
+    - CombinedMemory
+
+# LLM providers configuration
+llm_providers:
+  openai:
+    enabled: true
+    api_key: ${OPENAI_API_KEY}
+    model: "gpt-4o"
+    temperature: 0.7
+    max_tokens: 4000
+    timeout: 300
+    retry_attempts: 3
+  
+  anthropic:
+    enabled: true
+    api_key: ${ANTHROPIC_API_KEY}
+    model: "claude-sonnet-4-5"
+    temperature: 0.7
+    max_tokens: 100000
+    timeout: 600
+    retry_attempts: 3
+  
+  google:
+    enabled: true
+    api_key: ${GOOGLE_AI_API_KEY}
+    model: "gemini-pro"
+    temperature: 0.7
+    max_tokens: 32000
+    timeout: 600
+    retry_attempts: 2
+  
+  azure:
+    enabled: false
+    api_key: ${AZURE_OPENAI_API_KEY}
+    api_base: ${AZURE_OPENAI_ENDPOINT}
+    deployment_name: "gpt-4"
+    api_version: "2023-05-15"
+    temperature: 0.7
+    max_tokens: 4000
+
+# Tools configuration
+tools:
+  file_system:
+    enabled: true
+    allowed_paths:
+      - /home/cbwinslow/workspace
+      - /home/cbwinslow/dotfiles
+      - /home/cbwinslow/docs
+    blocked_commands:
+      - rm -rf /
+      - sudo
+      - chmod 777
+  
+  web_search:
+    enabled: true
+    max_results: 10
+    timeout: 30
+  
+  terminal:
+    enabled: true
+    allowed_commands:
+      - git
+      - ls
+      - cat
+      - grep
+      - find
+    blocked_commands:
+      - rm
+      - sudo
+      - chmod
+  
+  search:
+    enabled: true
+    search_engines:
+      - google
+      - bing
+    max_results: 5
+
+# Agent configuration
+agents:
+  default:
+    type: "conversational-react-description"
+    max_iterations: 10
+    verbose: true
+    memory: "ConversationBufferMemory"
+  
+  research:
+    type: "conversational-react-description"
+    max_iterations: 15
+    verbose: true
+    memory: "ConversationSummaryMemory"
+    tools: ["web_search", "search", "file_system"]
+  
+  code:
+    type: "conversational-react-description"
+    max_iterations: 20
+    verbose: true
+    memory: "ConversationBufferMemory"
+    tools: ["file_system", "terminal", "search"]
+
+# Chains configuration
+chains:
+  sequential:
+    max_length: 10
+    timeout: 600
+  router:
+    enabled: true
+    default_chain: "default"
+  sql_database:
+    enabled: true
+    database_url: ${DATABASE_URL}
+    sample_rows_in_table_info: 3
+
+# Callbacks configuration
+callbacks:
+  enabled: true
+  handlers:
+    - "StdOutCallbackHandler"
+    - "FileCallbackHandler"
+  file_callback:
+    file_path: "/home/cbwinslow/dotfiles/ai/frameworks/langchain/logs/callbacks.log"
+
+# Embeddings configuration
+embeddings:
+  openai:
+    enabled: true
+    model: "text-embedding-ada-002"
+    api_key: ${OPENAI_API_KEY}
+  
+  huggingface:
+    enabled: false
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+
+# Vector stores configuration
+vector_stores:
+  chroma:
+    enabled: true
+    persist_directory: "/home/cbwinslow/dotfiles/ai/frameworks/langchain/vector_stores/chroma"
+    collection_name: "langchain_docs"
+  
+  faiss:
+    enabled: false
+    index_path: "/home/cbwinslow/dotfiles/ai/frameworks/langchain/vector_stores/faiss.index"
+  
+  pgvector:
+    enabled: true
+    connection_string: ${DATABASE_URL}
+    collection_name: "langchain_vectors"
+
+# Document loaders configuration
+document_loaders:
+  text:
+    enabled: true
+    file_extensions: [".txt", ".md", ".rst"]
+  pdf:
+    enabled: true
+    extract_images: false
+  html:
+    enabled: true
+    bs_kwargs:
+      parse_only: "div"
+  web:
+    enabled: true
+    max_depth: 2
+    allowed_domains: ["github.com", "stackoverflow.com"]
+
+# Prompt templates configuration
+prompt_templates:
+  default:
+    template: "You are a helpful AI assistant. Answer the question based on the context provided."
+  research:
+    template: "You are a research assistant. Provide detailed, well-cited answers with sources."
+  code:
+    template: "You are a code expert. Provide clear, efficient, and well-documented code solutions."
+
+# Environment-specific overrides
+environments:
+  development:
+    debug: true
+    log_level: "DEBUG"
+    memory_ttl_days: 7
+    vector_store: "chroma"
+  
+  production:
+    debug: false
+    log_level: "INFO"
+    memory_ttl_days: 90
+    vector_store: "pgvector"
+    max_concurrent_requests: 10
+
+# Integration settings
+integrations:
+  agent_memory:
+    enabled: true
+    package_path: "/home/cbwinslow/dotfiles/ai/packages/agent_memory"
+    auto_sync: true
+    sync_interval: 300  # seconds
+  
+  letta:
+    enabled: true
+    server_url: "http://localhost:8283"
+    api_key: ${LETTA_API_KEY}
+    auto_sync: true
+    sync_interval: 600  # seconds
+
+# Performance settings
+performance:
+  max_concurrent_requests: 5
+  request_timeout: 300
+  retry_delay: 1
+  max_retry_delay: 60
+  enable_caching: true
+  cache_ttl: 3600  # seconds

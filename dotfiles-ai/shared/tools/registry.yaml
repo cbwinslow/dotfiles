@@ -1,0 +1,160 @@
+# Tools Registry
+# Centralized catalog of all available tools for AI agents
+# Location: ~/dotfiles/ai/tools/registry.yaml
+
+# Core Tools (Available to all agents)
+core:
+  file_system:
+    path: tools/cli_tools/file_system
+    description: "File and directory operations"
+    required: true
+    capabilities:
+      - read_file
+      - write_file
+      - delete_file
+      - create_directory
+      - list_directory
+      - search_files
+      - copy_file
+      - move_file
+      
+  terminal:
+    path: tools/cli_tools/terminal
+    description: "Execute shell commands"
+    required: true
+    capabilities:
+      - execute_command
+      - run_script
+      - background_process
+      - check_output
+      
+  search:
+    path: tools/cli_tools/search
+    description: "Search codebase using ripgrep"
+    required: true
+    capabilities:
+      - grep_search
+      - file_search
+      - content_search
+      
+  bitwarden:
+    path: tools/api_tools/bitwarden
+    description: "Secure access to Bitwarden credentials and API keys"
+    required: true
+    capabilities:
+      - get_api_key
+      - populate_env_file
+      - list_vaults
+      - search_credentials
+      - validate_configuration
+
+# Web Tools
+web:
+  web_fetch:
+    path: tools/api_tools/web_fetch
+    description: "Fetch and parse web content"
+    required: false
+    capabilities:
+      - fetch_url
+      - parse_html
+      - extract_content
+      
+  web_search:
+    path: tools/api_tools/web_search
+    description: "Search the web"
+    required: false
+    capabilities:
+      - search_query
+      - get_results
+      - filter_results
+
+# Letta Tools
+letta:
+  store_conversation:
+    path: tools/letta/store_conversation
+    description: "Save conversation to Letta"
+    required: true
+    
+  search_memories:
+    path: tools/letta/search_memories
+    description: "Search Letta memories"
+    required: true
+    
+  get_memory_stats:
+    path: tools/letta/get_memory_stats
+    description: "Get memory statistics"
+    required: true
+    
+  check_server_health:
+    path: tools/letta/check_server_health
+    description: "Check Letta server health"
+    required: true
+    
+  setup_agent_memory:
+    path: tools/letta/setup_agent_memory
+    description: "Setup agent memory in Letta"
+    required: true
+    
+  sync_agent_context:
+    path: tools/letta/sync_agent_context
+    description: "Sync agent context with Letta"
+    required: true
+    
+  create_agent_profile:
+    path: tools/letta/create_agent_profile
+    description: "Create agent profile in Letta"
+    required: false
+    
+  backup_memories:
+    path: tools/letta/backup_memories
+    description: "Backup memories to PostgreSQL"
+    required: false
+
+# Data Tools
+data:
+  json_processor:
+    path: tools/data_tools/json_processor
+    description: "Process JSON data"
+    required: false
+    
+  csv_processor:
+    path: tools/data_tools/csv_processor
+    description: "Process CSV data"
+    required: false
+    
+  yaml_processor:
+    path: tools/data_tools/yaml_processor
+    description: "Process YAML data"
+    required: false
+
+# Analysis Tools
+analysis:
+  code_analyzer:
+    path: tools/utility_tools/code_analyzer
+    description: "Analyze code structure"
+    required: false
+    
+  log_analyzer:
+    path: tools/utility_tools/log_analyzer
+    description: "Analyze log files"
+    required: false
+    
+  performance_profiler:
+    path: tools/utility_tools/performance_profiler
+    description: "Profile code performance"
+    required: false
+
+# Git Tools
+git:
+  git_operations:
+    path: tools/cli_tools/git
+    description: "Git version control operations"
+    required: false
+    capabilities:
+      - git_status
+      - git_diff
+      - git_commit
+      - git_push
+      - git_pull
+      - git_branch
+      - git_merge

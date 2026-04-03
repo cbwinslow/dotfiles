@@ -1,6 +1,6 @@
 {
   "version": "2.0.1",
-  "skills_count": 13,
+  "skills_count": 14,
   "skills": [
     {
       "name": "bitwarden-secrets",
@@ -203,7 +203,16 @@
       "path": "/home/cbwinslow/dotfiles/ai/shared/skills/knowledge_base",
       "tags": ["knowledge", "decisions", "runbooks", "documentation"],
       "agents": ["all"]
+    },
+    {
+      "name": "openrouter_free_models",
+      "description": "Fetch, filter, and test OpenRouter free models to maintain an active list of working free models. Available in Python, Shell, and TypeScript.",
+      "version": "1.0.0",
+      "category": "tools",
+      "path": "/home/cbwinslow/dotfiles/ai/skills/openrouter_free_models",
+      "tags": ["openrouter", "models", "free", "api", "testing"],
+      "agents": ["all"]
     }
   ],
-  "last_updated": "2026-04-02T11:30:00.000000"
+  "last_updated": "2026-04-03T00:00:00.000000"
 }

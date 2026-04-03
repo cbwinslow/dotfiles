@@ -1,11 +1,121 @@
-# Chezmoi state database (machine-specific, never committed)
-.chezmoistate.boltdb
+# =============================================================================
+# Git Ignore - Chezmoi Source Repository
+# =============================================================================
+# This .gitignore protects the chezmoi SOURCE state directory from
+# accidentally committing secrets, caches, and runtime data.
+# The .chezmoiignore file controls what chezmoi applies to the target.
+# =============================================================================
 
-# Editor backups
-*~
-*.swp
-*.swo
+# --- Age encryption key (NEVER commit) --------------------------------------
+key.txt
+key.txt.age
+*.age
 
-# OS files
+# --- Python caches ----------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node caches ------------------------------------------------------------
+node_modules/
+.npm/
+.cache/
+bun.lock
+package-lock.json
+
+# --- IDE runtime ------------------------------------------------------------
+.idea/
+.vscode/cstate*
+.vscode/db-*
+
+# --- OS junk ----------------------------------------------------------------
 .DS_Store
 Thumbs.db
+desktop.ini
+._*
+
+# --- Logs & temp ------------------------------------------------------------
+*.log
+logs/
+*.tmp
+*.swp
+*.swo
+*~
+*.bak
+
+# --- Terraform state --------------------------------------------------------
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+
+# --- Chezmoi state ----------------------------------------------------------
+chezmoistate.boltdb
+
+# --- HuggingFace / ML caches ------------------------------------------------
+.cache/huggingface/
+
+# --- AI model weights (too large for git) -----------------------------------
+*.bin
+*.safetensors
+*.gguf
+*.onnx
+*.h5
+*.pkl
+*.pt
+*.pth
+*.ckpt
+models/
+weights/
+
+# --- Docker volumes ---------------------------------------------------------
+volumes/
+_data/
+
+# --- Secret files -----------------------------------------------------------
+*.pem
+*.key
+id_rsa
+id_ed25519
+id_ecdsa
+id_dsa
+.bw_credentials
+.bw_master_password
+.env
+.env.*
+secrets.json
+auth.json
+api_keys.*
+credentials.*
+
+# --- Cline / Claude Code runtime --------------------------------------------
+.cline/data/sessions/
+.cline/data/tasks/
+.cline/data/workspaces/
+.cline/data/globalState.json
+.cline/data/state/
+.cline/data/cache/
+.cline/data/settings/
+.cline/kanban/
+.cline/data/sessions.db*
+.cline/ide/*.lock
+
+# --- Codex runtime ----------------------------------------------------------
+.codex/logs_*.sqlite*
+.codex/state_*.sqlite
+.codex/auth.json
+.codex/.tmp/
+
+# --- Windsurf / Codeium runtime ---------------------------------------------
+.codeium/windsurf/memories/*.pb
+.codeium/windsurf/installation_id
+.codeium/windsurf/native_storage_migrations.lock
+.codeium/windsurf/code_tracker/
+
+# --- Cursor runtime ---------------------------------------------------------
+.cursor/skills/**/__pycache__/

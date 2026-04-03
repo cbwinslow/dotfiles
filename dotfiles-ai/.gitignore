@@ -1,0 +1,154 @@
+# AI Dotfiles - Git Ignore
+# SECURITY: These patterns prevent sensitive files from being committed
+
+# ============================================
+# CRITICAL: Bitwarden Credentials (NEVER COMMIT)
+# ============================================
+.bw_credentials
+*.bw_credentials
+bw_credentials*
+.bw_master_password
+*bw*password*
+# Bitwarden skill credentials
+skills/bitwarden/.bw_credentials
+
+# ============================================
+# Secrets and Environment Files
+# ============================================
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+*.env
+
+# Secrets
+*.secret
+secrets/
+secrets.*
+credentials/
+credentials.*
+*.credentials
+
+# API Keys and Tokens
+*api_key*
+*apikey*
+*api-secret*
+*token*
+*.token
+
+# ============================================
+# SSH and Private Keys
+# ============================================
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
+id_ecdsa
+id_ecdsa.pub
+id_ed25519
+id_ed25519.pub
+.ssh/
+
+# ============================================
+# Certificates
+# ============================================
+*.crt
+*.cer
+*.der
+*.ca-bundle
+
+# ============================================
+# Database Files
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ============================================
+# Node.js
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================
+# IDE and Editor
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ============================================
+# Logs
+# ============================================
+*.log
+logs/
+log/
+
+# ============================================
+# Temporary Files
+# ============================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+
+# ============================================
+# Backup Files
+# ============================================
+*.bak
+*.backup
+*~
+
+# ============================================
+# Test Coverage
+# ============================================
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# ============================================
+# Misc
+# ============================================
+*.pid
+*.seed
+*.pid.lock
