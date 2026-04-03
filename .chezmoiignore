@@ -93,10 +93,11 @@ dotfiles-ai/validation_report.json
 dotfiles-ai/system_config.json
 
 # --- Secret files (use age encryption or password manager) -------------------
+# NOTE: SSH keys are encrypted with age and stored as encrypted_*.
+# Raw unencrypted secret files are still ignored.
 **/*.pem
 **/*.key
 **/id_rsa
-**/id_ed25519
 **/id_ecdsa
 **/id_dsa
 **/.bw_credentials

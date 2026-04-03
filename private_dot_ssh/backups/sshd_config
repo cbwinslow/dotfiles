@@ -1,0 +1,33 @@
+# SSH Server Configuration
+Port 22
+ListenAddress 0.0.0.0
+
+# Authentication
+PermitRootLogin prohibit-password
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+# Disable password auth for security (enable if needed)
+PasswordAuthentication yes
+
+# Security options
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+UsePAM yes
+
+# X11 forwarding
+X11Forwarding yes
+X11DisplayOffset 10
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Session options
+ClientAliveInterval 300
+ClientAliveCountMax 3
+TCPKeepAlive yes
+
+# Override default of no subsystems
+Subsystem sftp /usr/lib/openssh/sftp-server
+

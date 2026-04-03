@@ -1,0 +1,20 @@
+Host galaxy
+    HostName 192.168.4.101
+    User cbwinslow
+    IdentityFile ~/.ssh/id_ed25519_cbw
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
+
+Host ubuntu
+    HostName 192.168.4.101
+    User cbwinslow
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
+
+Host ubuntu-galaxy
+    HostName 192.168.4.101
+    User cbwinslow
+    IdentityFile ~/.ssh/id_ed25519_galaxy
+    IdentitiesOnly yes
+    PreferredAuthentications publickey

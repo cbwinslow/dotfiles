@@ -6,10 +6,10 @@
 # The .chezmoiignore file controls what chezmoi applies to the target.
 # =============================================================================
 
-# --- Age encryption key (NEVER commit) --------------------------------------
+# --- Age encryption key (NEVER commit the decryption key) --------------------
 key.txt
 key.txt.age
-*.age
+# NOTE: encrypted_*.age files ARE committed - they contain safely encrypted data
 
 # --- Python caches ----------------------------------------------------------
 __pycache__/
