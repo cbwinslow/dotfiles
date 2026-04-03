@@ -1,0 +1,28 @@
+name: Chezmoi Validation
+
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Chezmoi
+        run: |
+          curl -sfL https://get.chezmoi.io | sh
+          ~/bin/chezmoi doctor
+          
+      - name: Validate Configuration
+        run: |
+          ~/bin/chezmoi diff
+          ~/bin/chezmoi verify
+          ~/bin/chezmoi doctor
+      
+      - name: Check for secrets
+        run: |
+          if grep -r "password\|secret\|token\|key" --include="*.tmpl" --include="*.yaml" --include="*.toml" . | grep -v "# "; then
+            echo "⚠️  Found potential secrets in configuration files"
+            exit 1
+          fi
+          echo "✓ No obvious secrets found in configuration files"

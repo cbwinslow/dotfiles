@@ -74,3 +74,5 @@ epstein-data/
 **/*.key
 **/id_rsa
 **/id_ed25519
+key.txt.age
+key.txt.age
