@@ -1,15 +1,10 @@
-# External configurations pulled from remote sources
-# These are downloaded and applied during chezmoi init/apply
+# External configurations - downloaded during chezmoi apply
+# Only use this for things that aren't in our repo
 
-# Starship prompt configuration
-[".config/starship/starship.toml"]
-    url = "https://raw.githubusercontent.com/starship/starship/master/config/starship.toml"
-    type = "file"
-    refreshPeriod = "168h"  # Refresh weekly
-    exact = false
-
-# Oh My Tmux (if we want it)
-# [".tmux/plugins/tpm"]
-#     url = "https://github.com/tmux-plugins/tpm"
+# Starship themes (example)
+# [".config/starship/themes"]
+#     url = "https://github.com/starship/starship/archive/refs/heads/master.tar.gz"
 #     type = "archive"
-#     refreshPeriod = "720h"  # Refresh monthly
+#     refreshPeriod = "168h"
+#     stripComponents = 1
+#     exact = false
