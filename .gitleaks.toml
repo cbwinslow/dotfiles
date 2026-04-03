@@ -1,0 +1,43 @@
+# Gitleaks configuration for dotfiles repository
+# https://github.com/gitleaks/gitleaks
+
+title = "Dotfiles Gitleaks Config"
+
+[extend]
+# Use default gitleaks rules as base
+useDefault = true
+
+# Allow specific patterns in dotfiles (template variables, not real secrets)
+[allowlist]
+description = "Global allowlist for dotfiles"
+paths = [
+    '''\.chezmoi.*\.tmpl$''',
+    '''.*\.example$''',
+    '''README\.md$''',
+    '''.*\.md$''',
+]
+
+# Custom rules for dotfiles-specific patterns
+[[rules]]
+id = "private-key-file"
+description = "Private key file detected"
+regex = '''-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'''
+tags = ["key", "private"]
+
+[[rules]]
+id = "github-token"
+description = "GitHub personal access token"
+regex = '''ghp_[a-zA-Z0-9]{36}'''
+tags = ["github", "token"]
+
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API key"
+regex = '''sk-[a-zA-Z0-9]{48}'''
+tags = ["openai", "api"]
+
+[[rules]]
+id = "postgres-connection-string"
+description = "PostgreSQL connection string with password"
+regex = '''postgres(?:ql)?://[^:]+:[^@]+@'''
+tags = ["database", "password"]

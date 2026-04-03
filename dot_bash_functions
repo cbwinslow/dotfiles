@@ -1,0 +1,150 @@
+#!/bin/bash
+
+# Useful bash functions
+
+# Bitwarden Functions
+bw_unlock() {
+    echo "Unlocking Bitwarden vault..."
+    export BW_SESSION=$(bw unlock --raw)
+    echo "Vault unlocked!"
+}
+
+bw_sync() {
+    echo "Syncing Bitwarden vault..."
+    bw sync
+    echo "Vault synced!"
+}
+
+bw_search() {
+    if [ -z "$1" ]; then
+        echo "Usage: bw_search <search_term>"
+        return 1
+    fi
+    bw list items --search "$1" | jq '.[] | {name: .name, id: .id, type: .type}'
+}
+
+bw_get_login() {
+    if [ -z "$1" ]; then
+        echo "Usage: bw_get_login <item_id>"
+        return 1
+    fi
+    bw get item "$1" | jq '.login | {username: .username, password: .password}'
+}
+
+# Git Functions
+git_current_branch() {
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
+}
+
+git_delete_merged_branches() {
+    git branch --merged | grep -v "\*\|master\|main\|develop" | xargs -n 1 git branch -d
+}
+
+# System Functions
+cbw_ps() {
+    ps aux | grep -v grep | grep "$1"
+}
+
+cbw_kill() {
+    if [ -z "$1" ]; then
+        echo "Usage: cbw_kill <process_name>"
+        return 1
+    fi
+    pids=$(pgrep "$1")
+    if [ -z "$pids" ]; then
+        echo "No processes found matching '$1'"
+        return 1
+    fi
+    echo "Killing processes: $pids"
+    kill $pids
+}
+
+# File Functions
+cbw_find_large_files() {
+    if [ -z "$1" ]; then
+        find . -type f -size +100M -print
+    else
+        find "$1" -type f -size +100M -print
+    fi
+}
+
+cbw_find_by_ext() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "Usage: cbw_find_by_ext <directory> <extension>"
+        return 1
+    fi
+    find "$1" -name "*.$2" -type f
+}
+
+# Network Functions
+cbw_check_port() {
+    if [ -z "$1" ]; then
+        echo "Usage: cbw_check_port <port>"
+        return 1
+    fi
+    netstat -tulpn | grep ":$1 "
+}
+
+cbw_public_ip() {
+    curl -s https://ipinfo.io/ip
+}
+
+cbw_local_ip() {
+    hostname -I | awk '{print $1}'
+}
+
+# Utility Functions
+cbw_calc() {
+    echo "$*" | bc
+}
+
+cbw_path() {
+    echo $PATH | tr ':' '\n'
+}
+
+cbw_extract() {
+    if [ -f "$1" ] ; then
+        case $1 in
+            *.tar.bz2)   tar xjf "$1"     ;;
+            *.tar.gz)    tar xzf "$1"     ;;
+            *.bz2)       bunzip2 "$1"     ;;
+            *.rar)       unrar e "$1"     ;;
+            *.gz)        gunzip "$1"      ;;
+            *.tar)       tar xf "$1"      ;;
+            *.tbz2)      tar xjf "$1"     ;;
+            *.tgz)       tar xzf "$1"     ;;
+            *.zip)       unzip "$1"       ;;
+            *.Z)         uncompress "$1"  ;;
+            *.7z)        7z x "$1"        ;;
+            *)           echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# Prompt Functions
+parse_git_branch() {
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \\(.*\\)/\\(\\1\\)/'
+}
+
+parse_kube_context() {
+    if command -v kubectl &> /dev/null; then
+        local context=$(kubectl config current-context 2>/dev/null)
+        if [ ! -z "$context" ]; then
+            echo " [k8s:$context]"
+        fi
+    fi
+}
+
+parse_venv() {
+    if [ ! -z "$VIRTUAL_ENV" ]; then
+        echo " [venv:$(basename $VIRTUAL_ENV)]"
+    fi
+}
+
+parse_conda_env() {
+    if [ ! -z "$CONDA_DEFAULT_ENV" ]; then
+        echo " [conda:$CONDA_DEFAULT_ENV]"
+    fi
+}

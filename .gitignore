@@ -1,0 +1,11 @@
+# Chezmoi state database (machine-specific, never committed)
+.chezmoistate.boltdb
+
+# Editor backups
+*~
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

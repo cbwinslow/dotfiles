@@ -1,0 +1,209 @@
+{
+  "version": "2.0.1",
+  "skills_count": 13,
+  "skills": [
+    {
+      "name": "bitwarden-secrets",
+      "description": "Securely retrieve API keys, passwords, and secrets from Bitwarden vault for use in AI agent workflows",
+      "version": "1.0.0",
+      "category": "security",
+      "path": "/home/cbwinslow/dotfiles/ai/skills/bitwarden_secrets",
+      "tags": [
+        "bitwarden",
+        "secrets",
+        "api-keys",
+        "security",
+        "mcp"
+      ],
+      "agents": [
+        "claude",
+        "cline",
+        "codex",
+        "windsurf",
+        "kilocode",
+        "opencode"
+      ]
+    },
+    {
+      "name": "github",
+      "description": "GitHub operations via `gh` CLI: issues, PRs, CI runs, code review, API queries. Use when: (1) checking PR status or CI, (2) creating/commenting on issues, (3) listing/filtering PRs or issues, (4) viewing run logs. NOT for: complex web UI interactions requiring manual browser flows (use browser tooling when available), bulk operations across many repos (script with gh api), or when gh auth is not configured.",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/skills/github",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "conversation_logger",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/skills/conversation_logger",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "Letta Self-Hosted Integration",
+      "description": "Complete Letta integration using official letta-client SDK. Supports agent management, memory blocks, shared memory, archival memory, MCP tools, and agent file operations.",
+      "version": "2.0.0",
+      "category": "memory",
+      "path": "/home/cbwinslow/dotfiles/ai/skills/letta_integration",
+      "tags": [
+        "letta",
+        "memory",
+        "agents",
+        "sdk",
+        "self-hosted"
+      ],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "model_picker",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/skills/model_picker",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "letta_model_picker",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/skills/letta_model_picker",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "conversation_logging",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/conversation_logging",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "bitwarden",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/bitwarden",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "cbw_rag",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/cbw_rag",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "letta_server",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/letta_server",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "memory_sync",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/memory_sync",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "cli_operations",
+      "description": "No description",
+      "version": "1.0.0",
+      "category": "general",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/cli_operations",
+      "tags": [],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "gdrive-download",
+      "description": "Download files and folders from Google Drive via the terminal. Handles large files, virus scan bypass, folder downloads, and resume support. Use when a user provides a Google Drive link or file ID.",
+      "version": "1.0.0",
+      "category": "tools",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/gdrive-download",
+      "tags": [
+        "google-drive",
+        "download",
+        "gdown",
+        "files",
+        "folders"
+      ],
+      "agents": [
+        "all"
+      ]
+    },
+    {
+      "name": "letta_memory",
+      "description": "Unified Letta memory operations - core memory, archival storage, cross-agent search. Primary memory interface for all agents.",
+      "version": "2.0.0",
+      "category": "memory",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/letta_memory",
+      "tags": ["letta", "memory", "archival", "core", "cross-agent"],
+      "agents": ["all"]
+    },
+    {
+      "name": "letta_workflows",
+      "description": "Stateful workflow automation backed by Letta memory. Resumable multi-step processes across sessions and agents.",
+      "version": "1.0.0",
+      "category": "automation",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/letta_workflows",
+      "tags": ["letta", "workflows", "automation", "state"],
+      "agents": ["all"]
+    },
+    {
+      "name": "cross_agent_coordinator",
+      "description": "Multi-agent coordination via shared Letta memory. Post findings, request help, share knowledge across the agent ecosystem.",
+      "version": "1.0.0",
+      "category": "coordination",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/cross_agent_coordinator",
+      "tags": ["coordination", "cross-agent", "letta", "shared-memory"],
+      "agents": ["all"]
+    },
+    {
+      "name": "knowledge_base",
+      "description": "Structured knowledge capture and retrieval from Letta. Decision records, runbooks, architecture decisions, debugging knowledge.",
+      "version": "1.0.0",
+      "category": "knowledge",
+      "path": "/home/cbwinslow/dotfiles/ai/shared/skills/knowledge_base",
+      "tags": ["knowledge", "decisions", "runbooks", "documentation"],
+      "agents": ["all"]
+    }
+  ],
+  "last_updated": "2026-04-02T11:30:00.000000"
+}

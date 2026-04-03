@@ -1,0 +1,77 @@
+# KiloCode Agent Configuration
+# Large-scale code operations with ALL skills
+
+name: "kilocode"
+description: "KiloCode agent for large-scale code operations with access to ALL skills"
+
+models:
+  preferred:
+    - "openrouter/qwen/qwen2.5-coder"
+    - "gemini-2.5-flash"
+
+skills:
+  - "coding"
+  - "python-refactor"
+  - "code-review"
+  - "debug"
+  - "analyze"
+  - "visualize"
+  - "shell"
+  - "git"
+  - "github"
+  - "docker-ops"
+  - "infrastructure"
+  - "research"
+  - "cbw_rag"                    # Codebase search
+  - "letta_agents"
+  - "letta_memory"
+  - "letta_blocks"
+  - "unified_memory"
+  - "reuse"
+  - "tasks"
+
+memory:
+  primary: letta_server
+  agent_name: kilocode
+  auto_save: true
+  blocks:
+    persona: "I am KiloCode, large-scale code operations agent with full skill access."
+    human: "User works with large codebases and needs scalable operations."
+
+tools:
+  - "filesystem"
+  - "terminal"
+  - "git"
+  - "docker"
+  - "search"
+  - "cbw_debug"
+  - "cbw_analyze"
+  - "cbw_visualize"
+  - "cbw_reuse"
+  - "cbw_letta"
+  - "letta_memory_cli"
+
+workflows:
+  - "large-scale-refactoring"
+  - "codebase-analysis"
+  - "cross-agent-coordination"
+
+mcp_servers:
+  - "letta_server"
+  - "unified_memory"
+
+behavior:
+  share_discoveries: true
+  use_letta_memory: true
+
+instructions: |
+  You are KiloCode agent with full skill access.
+  
+  Large-scale code operations specialist.
+  Optimized for big codebases.
+
+notes:
+  - "Large-scale + all skills"
+  - "Use analyze for big codebases"
+  - "Batch operations"
+  - "Use cbw_rag to search large codebases"

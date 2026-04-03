@@ -1,0 +1,76 @@
+# Chezmoi ignore patterns
+# Files matching these patterns will NOT be managed by chezmoi
+
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/venv
+**/.venv
+**/env
+
+# Node
+**/node_modules
+**/.npm
+**/.cache/yarn
+
+# Git internals
+**/.git
+**/.github/workflows/*.log
+
+# Large binaries and model weights
+**/*.bin
+**/*.safetensors
+**/*.gguf
+**/*.onnx
+**/*.h5
+**/*.pkl
+
+# Docker volume data
+**/volumes
+**/_data
+
+# IDE
+**/.idea
+**/.vscode/settings.json
+**/.vscode/sync
+
+# OS
+**/.DS_Store
+**/Thumbs.db
+
+# Logs
+**/*.log
+**/logs/
+
+# Terraform
+**/.terraform
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/.terraform.lock.hcl
+
+# Chezmoi internals
+**/chezmoistate.boltdb
+
+# HuggingFace cache
+**/.cache/huggingface
+
+# Large AI directories (managed separately via .chezmoiexternal)
+dotfiles-ai/skills/**/models/
+dotfiles-ai/skills/**/weights/
+dotfiles-ai/skills/**/.cache/
+
+# Epstein project data (too large, separate data repo)
+epstein-data/
+
+# Temp files
+**/*.tmp
+**/*.swp
+**/*.swo
+**/*~
+
+# Secrets that should be in password manager, not templates
+**/*.pem
+**/*.key
+**/id_rsa
+**/id_ed25519

@@ -1,0 +1,9 @@
+# Load NVM first to ensure Node version management works
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Then load .bashrc for other configurations
+if [ -n "$BASH" ] && [ -f "$HOME/.bashrc" ]; then
+    source "$HOME/.bashrc"
+fi

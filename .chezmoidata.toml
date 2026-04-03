@@ -1,0 +1,64 @@
+# Shared data available in all templates
+# Access via {{ .package_name }} in .tmpl files
+
+[packages]
+    # System packages (apt)
+    system = [
+        "git",
+        "curl",
+        "wget",
+        "htop",
+        "tmux",
+        "unzip",
+        "jq",
+        "tree",
+        "ncdu",
+        "iotop",
+        "build-essential",
+        "cmake",
+        "postgresql-client",
+        "redis-tools",
+        "nfs-common",
+        "cifs-utils",
+        "fail2ban",
+        "ufw",
+    ]
+
+    # Python packages (pip/pipx global)
+    python = [
+        "pipx",
+        "ruff",
+        "black",
+        "mypy",
+    ]
+
+    # Node packages (npm global)
+    node = [
+        "@anthropic-ai/claude-code",
+        "@openai/codex",
+    ]
+
+[tools]
+    starship = "latest"
+    atuin = "latest"
+    nvm = "latest"
+    ollama = "latest"
+
+[docker]
+    stacks = [
+        "traefik",
+        "postgres",
+        "monitoring",
+        "openclaw",
+        "n8n",
+        "local-ai",
+        "letta",
+        "open-webui",
+    ]
+
+[ai]
+    default_model = "openrouter/openai/gpt-4.5-mini"
+    coding_model = "openrouter/qwen/qwen2.5-coder"
+    research_model = "openrouter/anthropic/claude-3.7-sonnet"
+    ollama_host = "localhost:11434"
+    letta_host = "localhost:8283"

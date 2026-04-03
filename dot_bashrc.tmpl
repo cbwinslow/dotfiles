@@ -1,0 +1,307 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+#shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
+    else
+        color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[\033[01;31m\]$(parse_git_branch)\[\033[00m\]\[\033[01;33m\]$(parse_kube_context)\[\033[00m\]\[\033[01;35m\]$(parse_venv)\[\033[00m\]\[\033[01;36m\]$(parse_conda_env)\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w$(parse_git_branch)$(parse_kube_context)$(parse_venv)$(parse_conda_env)\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# some more ls aliases
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# Custom functions
+if [ -f ~/.bash_functions ]; then
+    . ~/.bash_functions
+fi
+
+# Secrets management
+if [ -f ~/.bash_secrets ]; then
+    . ~/.bash_secrets
+fi
+
+# Auto-source Bitwarden secrets if available
+if [ -f /tmp/bw_secrets_exports.sh ]; then
+    . /tmp/bw_secrets_exports.sh
+fi
+
+# direnv integration (only if direnv is installed)
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook bash)"
+fi
+
+# Custom environment variables
+export CBWDELLR720=172.28.208.142
+export CBWHPZ=172.28.142.111
+export CBWLAPKALI=172.28.196.74
+
+# Source NVM for Node.js version management
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Source activity logger
+ACTIVITY_LOGGER="$HOME/Projects/Data/activity_logs/activity_logger.sh"
+[ -s "$ACTIVITY_LOGGER" ] && . "$ACTIVITY_LOGGER"
+
+# Set up custom paths
+export QLTY_INSTALL="$HOME/.qlty"
+
+# Source NVM for Node.js version management (do this first to ensure NVM is available)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Source cargo environment if present
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Build PATH with proper precedence (highest priority first)
+# Start with essential system paths
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+
+# Add custom development tools (before system paths to take precedence)
+export PATH="$HOME/.opencode/bin:$HOME/.qlty/bin:$HOME/.dotbins/linux/amd64/bin:$PATH"
+
+# Add specific application paths
+export PATH="$PATH:/home/cbwinslow/.pulumi/bin"
+export PATH="$PATH:/home/cbwinslow/dotfiles/scripts"
+export PATH="$PATH:/home/foomanchu8008/.lmstudio/bin"
+export PATH="$PATH:/home/foomanchu8008/.local/bin"
+
+# Add Homebrew paths (to override system tools where needed, but NVM should still manage Node)
+if command -v brew >/dev/null 2>&1; then
+  eval "$(brew shellenv)"
+elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# Add NPM global after NVM
+export PATH="$PATH:$HOME/.npm-global/bin"
+
+# Add the specific node@24 path after homebrew, but NVM should still take precedence where it matters
+export PATH="$PATH:/home/linuxbrew/.linuxbrew/opt/node@24/bin"
+
+# Finally add user's local bin (should be low priority)
+export PATH="$PATH:$HOME/bin"
+
+# Editor configuration
+export EDITOR=nano
+export VISUAL=nano
+
+# History configuration
+export HISTSIZE=10000
+export HISTFILESIZE=10000
+export HISTCONTROL=ignoredups:ignorespace
+
+# FZF configuration
+if command -v fzf &> /dev/null; then
+    export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+fi
+
+# Only source atuin if it exists
+if [ -f "$HOME/.atuin/bin/env" ]; then
+  . "$HOME/.atuin/bin/env"
+  [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
+  eval "$(atuin init bash)"
+fi
+
+# Source secrets for AI tools (RAG database, API keys, etc.)
+if [ -f "$HOME/.bash_secrets" ]; then
+  . "$HOME/.bash_secrets"
+fi
+
+# Unified AI Skills Auto-Loader
+export AI_SKILLS_ROOT="${HOME}/dotfiles/ai/skills"
+export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/shared/skills"
+
+# Load skills function for any agent
+load_ai_skills() {
+    local agent_name="${1:-$(basename "$0")}"
+    export CURRENT_AI_AGENT="$agent_name"
+    export AI_SKILLS_AVAILABLE="${AI_SKILLS_ROOT}"
+    
+    # Python path for imports
+    if [[ ":$PYTHONPATH:" != *":${HOME}/dotfiles/ai/packages/letta_integration:"* ]]; then
+        export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/packages/letta_integration"
+    fi
+}
+
+# Auto-load for known agents
+if [[ "$0" == *"claude"* ]]; then load_ai_skills "claude"; fi
+if [[ "$0" == *"cline"* ]]; then load_ai_skills "cline"; fi
+if [[ "$0" == *"codex"* ]]; then load_ai_skills "codex"; fi
+if [[ "$0" == *"windsurf"* ]]; then load_ai_skills "windsurf"; fi
+if [[ "$0" == *"openclaw"* ]]; then load_ai_skills "openclaw"; fi
+
+# Unified AI Skills Auto-Loader
+export AI_SKILLS_ROOT="${HOME}/dotfiles/ai/skills"
+export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/shared/skills"
+
+# Load skills function for any agent
+load_ai_skills() {
+    local agent_name="${1:-$(basename "$0")}"
+    export CURRENT_AI_AGENT="$agent_name"
+    export AI_SKILLS_AVAILABLE="${AI_SKILLS_ROOT}"
+    
+    # Python path for imports
+    if [[ ":$PYTHONPATH:" != *":${HOME}/dotfiles/ai/packages/letta_integration:"* ]]; then
+        export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/packages/letta_integration"
+    fi
+}
+
+# Auto-load for known agents
+if [[ "$0" == *"claude"* ]]; then load_ai_skills "claude"; fi
+if [[ "$0" == *"cline"* ]]; then load_ai_skills "cline"; fi
+if [[ "$0" == *"codex"* ]]; then load_ai_skills "codex"; fi
+if [[ "$0" == *"windsurf"* ]]; then load_ai_skills "windsurf"; fi
+if [[ "$0" == *"openclaw"* ]]; then load_ai_skills "openclaw"; fi
+
+# Unified AI Skills Auto-Loader
+export AI_SKILLS_ROOT="${HOME}/dotfiles/ai/skills"
+export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/shared/skills"
+
+# Load skills function for any agent
+load_ai_skills() {
+    local agent_name="${1:-$(basename "$0")}"
+    export CURRENT_AI_AGENT="$agent_name"
+    export AI_SKILLS_AVAILABLE="${AI_SKILLS_ROOT}"
+    
+    # Python path for imports
+    if [[ ":$PYTHONPATH:" != *":${HOME}/dotfiles/ai/packages/letta_integration:"* ]]; then
+        export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/packages/letta_integration"
+    fi
+}
+
+# Auto-load for known agents
+if [[ "$0" == *"claude"* ]]; then load_ai_skills "claude"; fi
+if [[ "$0" == *"cline"* ]]; then load_ai_skills "cline"; fi
+if [[ "$0" == *"codex"* ]]; then load_ai_skills "codex"; fi
+if [[ "$0" == *"windsurf"* ]]; then load_ai_skills "windsurf"; fi
+if [[ "$0" == *"openclaw"* ]]; then load_ai_skills "openclaw"; fi
+
+# Unified AI Skills Auto-Loader
+export AI_SKILLS_ROOT="${HOME}/dotfiles/ai/skills"
+export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/shared/skills"
+
+# Load skills function for any agent
+load_ai_skills() {
+    local agent_name="${1:-$(basename "$0")}"
+    export CURRENT_AI_AGENT="$agent_name"
+    export AI_SKILLS_AVAILABLE="${AI_SKILLS_ROOT}"
+    
+    # Python path for imports
+    if [[ ":$PYTHONPATH:" != *":${HOME}/dotfiles/ai/packages/letta_integration:"* ]]; then
+        export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/packages/letta_integration"
+    fi
+}
+
+# Auto-load for known agents
+if [[ "$0" == *"claude"* ]]; then load_ai_skills "claude"; fi
+if [[ "$0" == *"cline"* ]]; then load_ai_skills "cline"; fi
+if [[ "$0" == *"codex"* ]]; then load_ai_skills "codex"; fi
+if [[ "$0" == *"windsurf"* ]]; then load_ai_skills "windsurf"; fi
+if [[ "$0" == *"openclaw"* ]]; then load_ai_skills "openclaw"; fi
+{{- $hf_token := promptStringOnce . "hf_token" "HuggingFace token (hf_...)" -}}
+export HF_TOKEN={{ $hf_token | quote }}

@@ -1,0 +1,12 @@
+[user]
+	name = {{ .username | default "cbwinslow" }}
+	email = {{ .email | default "blaine.winslow@gmail.com" | quote }}
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[core]
+	autocrlf = false
+[url "https://oauth2:@github.com/"]
+	insteadOf = https://github.com/

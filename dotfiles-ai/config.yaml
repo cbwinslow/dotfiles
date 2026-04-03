@@ -1,0 +1,205 @@
+# AI Agent Management System - Global Configuration
+# Location: ~/.config/ai/config.yaml
+# Managed by: chezmoi (~/dotfiles/ai/config.yaml)
+
+# ============================================
+# MODEL CONFIGURATION (Free Tier Only)
+# ============================================
+models:
+  # Default model for general tasks
+  default: "openrouter/openai/gpt-4.5-mini"
+  
+  # Coding-optimized models
+  coding: "openrouter/qwen/qwen2.5-coder"
+  coding_alt: "openrouter/deepseek/deepseek-coder"
+  
+  # Fast/lightweight models
+  fast: "openrouter/openai/gpt-4.5-mini"
+  
+  # Research/analytical models
+  research: "openrouter/anthropic/claude-3.7-sonnet"
+  
+  # Provider-specific models
+  gemini: "gemini-2.5-flash"
+  qwen: "qwen/qwen2.5-7b-instruct"
+  grok: "x-ai/grok-4-1-fast"
+
+# ============================================
+# PATH CONFIGURATION
+# ============================================
+paths:
+  # Root AI configuration directory
+  ai_dir: "~/.config/ai"
+  
+  # Subdirectories
+  agents_dir: "~/.config/ai/agents"
+  skills_dir: "~/.config/ai/skills"
+  tools_dir: "~/.config/ai/tools"
+  workflows_dir: "~/.config/ai/workflows"
+  configs_dir: "~/.config/ai/configs"
+  
+  # Logs and state
+  logs_dir: "~/.local/state/ai/logs"
+  cache_dir: "~/.cache/ai"
+
+# ============================================
+# SECURITY SETTINGS
+# ============================================
+security:
+  # Allow shell command execution
+  allow_shell: true
+  
+  # Allow network access
+  allow_network: true
+  
+  # Sandbox root for isolated operations
+  sandbox_root: "~/ai-sandboxes"
+  
+  # Require confirmation for destructive actions
+  destructive_actions_require_confirmation: true
+  
+  # Allowed paths for file access
+  allowed_paths:
+    - /home/cbwinslow/workspace
+    - /home/cbwinslow/dotfiles
+    - /home/cbwinslow/infra
+    - /home/cbwinslow/projects
+  
+  # Blocked commands
+  blocked_commands:
+    - "rm -rf /"
+    - "sudo"
+    - "chmod 777"
+
+# ============================================
+# DEFAULT AGENT ASSIGNMENTS
+# ============================================
+defaults:
+  # Default agent for coding tasks
+  coding_agent: "coding"
+  
+  # Default agent for ops/SRE tasks
+  ops_agent: "ops"
+  
+  # Default agent for research tasks
+  research_agent: "research"
+  
+  # Default agent for general tasks
+  general_agent: "general"
+
+# ============================================
+# PROVIDER CONFIGURATION
+# ============================================
+providers:
+  openrouter:
+    base_url: "https://openrouter.ai/api/v1"
+    env_key: "OPENROUTER_API_KEY"
+    default_model: "openrouter/qwen/qwen2.5-coder"
+    
+  gemini:
+    env_key: "GEMINI_API_KEY"
+    default_model: "gemini-2.5-flash"
+    
+  qwen:
+    env_key: "QWEN_API_KEY"
+    default_model: "qwen/qwen2.5-7b-instruct"
+    
+  kilo_free:
+    base_url: "https://kilo.ai/api/v1"
+    env_key: "KILO_API_KEY"
+    
+  cline_free:
+    base_url: "https://api.cline.bot/v1"
+    env_key: "CLINE_API_KEY"
+
+# ============================================
+# AGENT BEHAVIOR SETTINGS
+# ============================================
+behavior:
+  # Maximum iterations for agent loops
+  max_iterations: 10
+  
+  # Allow self-modification (dangerous)
+  allow_self_modification: false
+  
+  # Require approval for actions
+  require_approval: false
+  
+  # Auto-save progress
+  auto_save_progress: true
+  
+  # Search memory before starting tasks
+  search_memory_first: true
+  
+  # Max concurrent tasks
+  max_parallel_tasks: 3
+  
+  # Timeout for operations (seconds)
+  timeout_seconds: 300
+  
+  # Retry attempts for failed operations
+  retry_attempts: 2
+
+# ============================================
+# MEMORY CONFIGURATION
+# ============================================
+memory:
+  # Memory backend (letta_server, sqlite, etc.)
+  backend: letta_server
+  
+  # Letta server configuration
+  letta_server_url: "${LETTA_SERVER_URL:-http://localhost:8283}"
+  letta_api_key: "${LETTA_API_KEY}"
+  
+  # Auto-save conversations
+  auto_save: true
+  
+  # Auto-load previous context
+  auto_load: true
+  
+  # Default TTL for memories (days)
+  default_ttl_days: 90
+  
+  # Max memory size (MB)
+  max_memory_size_mb: 100
+  
+  # Cleanup interval (hours)
+  cleanup_interval_hours: 24
+
+# ============================================
+# MCP SERVER CONFIGURATION
+# ============================================
+mcp_servers:
+  bitwarden:
+    command: npx
+    args: ["-y", "@bitwarden/mcp-server"]
+    env:
+      BW_SESSION: "${BW_SESSION}"
+  
+  cbw_rag:
+    command: python3
+    args: ["~/.config/ai/shared/mcp/rag_server.py"]
+    env:
+      CBW_RAG_DATABASE: "${CBW_RAG_DATABASE}"
+      CBW_RAG_OLLAMA_URL: "${CBW_RAG_OLLAMA_URL:-http://localhost:8081}"
+      CBW_RAG_EMBEDDING_MODEL: "${CBW_RAG_EMBEDDING_MODEL:-nomic-embed-text}"
+  
+  letta_server:
+    command: python3
+    args: ["~/.config/ai/packages/letta_integration/letta_server_cli.py"]
+    env:
+      LETTA_SERVER_URL: "${LETTA_SERVER_URL:-http://localhost:8283}"
+      LETTA_API_KEY: "${LETTA_API_KEY}"
+
+# ============================================
+# ENVIRONMENT VARIABLES REQUIRED
+# ============================================
+# These should be set in ~/.env.ai (not in git):
+# - OPENROUTER_API_KEY
+# - GEMINI_API_KEY
+# - QWEN_API_KEY
+# - KILO_API_KEY (for KiloCode)
+# - CLINE_API_KEY (for Cline)
+# - LETTA_SERVER_URL
+# - LETTA_API_KEY
+# - BW_SESSION (for Bitwarden MCP)

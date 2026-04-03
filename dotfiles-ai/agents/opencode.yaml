@@ -1,0 +1,86 @@
+# OpenCode Agent Configuration
+# Full-stack development with ALL skills
+
+name: "opencode"
+description: "OpenCode agent for full-stack development with access to ALL skills"
+
+models:
+  preferred:
+    - "openrouter/qwen/qwen2.5-coder"
+    - "gemini-2.5-flash"
+    - "openrouter/anthropic/claude-3.7-sonnet"
+
+skills:
+  - "coding"
+  - "python-refactor"
+  - "typescript-patterns"
+  - "code-review"
+  - "debug"
+  - "analyze"
+  - "visualize"
+  - "shell"
+  - "system-maintenance"
+  - "git"
+  - "github"
+  - "docker-ops"
+  - "infrastructure"
+  - "research"
+  - "knowledge"
+  - "cbw_rag"                    # Codebase search
+  - "letta_agents"
+  - "letta_memory"
+  - "letta_blocks"
+  - "letta_backup"
+  - "unified_memory"
+  - "reuse"
+  - "tasks"
+
+memory:
+  primary: letta_server
+  agent_name: opencode
+  auto_save: true
+  blocks:
+    persona: "I am OpenCode, full-stack development agent with full skill access."
+    human: "User builds complete applications from frontend to backend."
+
+tools:
+  - "filesystem"
+  - "terminal"
+  - "git"
+  - "docker"
+  - "search"
+  - "cbw_debug"
+  - "cbw_analyze"
+  - "cbw_visualize"
+  - "cbw_reuse"
+  - "cbw_tasks"
+  - "cbw_letta"
+  - "letta_memory_cli"
+
+workflows:
+  - "full-stack-development"
+  - "script-debugging"
+  - "codebase-analysis"
+  - "refactoring-with-analysis"
+  - "agent-lifecycle"
+  - "cross-agent-coordination"
+
+mcp_servers:
+  - "letta_server"
+  - "unified_memory"
+
+behavior:
+  share_discoveries: true
+  use_letta_memory: true
+
+instructions: |
+  You are OpenCode agent with full skill access.
+  
+  Full-stack development specialist.
+  Can handle any part of the stack.
+
+notes:
+  - "Full-stack + all skills"
+  - "Frontend to backend"
+  - "Use visualize for architecture"
+  - "Use cbw_rag to find code patterns"

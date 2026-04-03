@@ -1,0 +1,63 @@
+#!/bin/bash
+# Auto-generated: Letta AI Skill Loader
+# This makes Letta skills available to all terminal AI agents
+
+# Load Letta integration skills
+if [ -f ~/dotfiles/ai/skills/letta_integration/shell_loader.sh ]; then
+    source ~/dotfiles/ai/skills/letta_integration/shell_loader.sh
+fi
+
+# Add AI packages to Python path
+export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/packages/letta_integration"
+export PYTHONPATH="${PYTHONPATH}:${HOME}/dotfiles/ai/shared/scripts"
+
+# Letta environment defaults
+export LETTA_SERVER_URL="${LETTA_SERVER_URL:-http://localhost:8283}"
+export LETTA_DEFAULT_MODEL="${LETTA_DEFAULT_MODEL:-letta/letta-free}"
+export LETTA_DEFAULT_EMBEDDING="${LETTA_DEFAULT_EMBEDDING:-ollama/bge-m3:latest}"
+
+# Agent-specific shortcuts
+alias windsurf-letta='python3 -c "
+import sys
+sys.path.insert(0, \"${HOME}/dotfiles/ai/packages/letta_integration\")
+from letta_integration import LettaIntegration
+letta = LettaIntegration(agent_name=\"windsurf\")
+print(f\"[windsurf] Letta ready: {letta.server_url}\")"'
+
+alias claude-letta='python3 -c "
+import sys
+sys.path.insert(0, \"${HOME}/dotfiles/ai/packages/letta_integration\")
+from letta_integration import LettaIntegration
+letta = LettaIntegration(agent_name=\"claude\")
+print(f\"[claude] Letta ready: {letta.server_url}\")"'
+
+alias openclaw-letta='python3 -c "
+import sys
+sys.path.insert(0, \"${HOME}/dotfiles/ai/packages/letta_integration\")
+from letta_integration import LettaIntegration
+letta = LettaIntegration(agent_name=\"openclaw\")
+print(f\"[openclaw] Letta ready: {letta.server_url}\")"'
+
+# Function to initialize any agent with Letta
+init_letta_agent() {
+    local agent_name="${1:-default}"
+    python3 << PYEOF
+import sys
+sys.path.insert(0, "${HOME}/dotfiles/ai/packages/letta_integration")
+from letta_integration import LettaIntegration
+letta = LettaIntegration(agent_name="$agent_name")
+agent = letta.create_agent_with_memory_blocks(
+    agent_name="$agent_name",
+    memory_blocks=[
+        {"label": "persona", "value": f"I am $agent_name, a helpful AI assistant."},
+        {"label": "human", "value": "User preferences and information."}
+    ]
+)
+print(f"[$agent_name] Agent created: {agent.id if agent else 'failed'}")
+PYEOF
+}
+
+# Export the function
+export -f init_letta_agent
+
+echo "Letta AI skills auto-loaded for all agents"

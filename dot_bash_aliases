@@ -1,0 +1,120 @@
+# Bash Aliases
+
+# Navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ~='cd ~'
+alias -- -='cd -'
+
+# LS aliases
+alias ls='ls --color=auto'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias lt='ls -lt --color=auto' # recent last
+alias ltr='ls -ltr --color=auto' # recent first
+
+# Git aliases
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gbD='git branch -D'
+alias gc='git commit -v'
+alias gc!='git commit -v --amend'
+alias gcn!='git commit -v --no-edit --amend'
+alias gca='git commit -v -a'
+alias gca!='git commit -v -a --amend'
+alias gcan!='git commit -v -a --no-edit --amend'
+alias gcm='git commit -m'
+alias gcam='git commit -a -m'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gcp='git cherry-pick'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gf='git fetch'
+alias gl='git pull'
+alias glg='git log --stat'
+alias glgp='git log --stat -p'
+alias glo='git log --oneline --decorate'
+alias glol="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'"
+alias glols="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --stat"
+alias glod="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset'"
+alias glods="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset' --date=short"
+alias gm='git merge'
+alias gp='git push'
+alias gpf='git push --force-with-lease'
+alias gpt='git push && git push --tags'
+alias gr='git remote'
+alias gra='git remote add'
+alias grb='git rebase'
+alias grba='git rebase --abort'
+alias grbc='git rebase --continue'
+alias grbi='git rebase -i'
+alias grh='git reset'
+alias grhh='git reset --hard'
+alias grm='git rm'
+alias grs='git restore'
+alias grss='git restore --source'
+alias grst='git restore --staged'
+alias gs='git status'
+alias gss='git status -s'
+alias gst='git stash'
+alias gsta='git stash apply'
+alias gstaa='git stash apply'
+alias gstc='git stash clear'
+alias gstd='git stash drop'
+alias gstl='git stash list'
+alias gstp='git stash pop'
+alias gsts='git stash show --text'
+
+# Docker aliases
+alias d='docker'
+alias dc='docker-compose'
+alias dps='docker ps'
+alias dpsa='docker ps -a'
+alias di='docker images'
+alias drm='docker rm'
+alias drmi='docker rmi'
+alias dexec='docker exec -it'
+
+# Kubernetes aliases
+alias k='kubectl'
+alias kctx='kubectl config use-context'
+alias kns='kubectl config set-context --current --namespace'
+
+# System aliases
+alias h='history'
+alias hg='history | grep'
+alias j='jobs'
+alias which='type -all'
+alias path='echo -e ${PATH//:/\\n}'
+alias duh='du -h --max-depth=1'
+alias dfh='df -h'
+alias meminfo='free -m -l -t'
+alias psmem='ps aux | sort -nr -k 4 | head -10'
+alias pscpu='ps aux | sort -nr -k 3 | head -10'
+alias cpuinfo='lscpu'
+alias untar='tar -xvf'
+alias wget='wget -c'
+
+# Development aliases
+alias py='python3'
+alias pyv='python3 --version'
+alias pip='pip3'
+alias serve='python3 -m http.server'
+alias reload!='source ~/.bashrc'
+
+# Safety aliases
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias ln='ln -i'
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'

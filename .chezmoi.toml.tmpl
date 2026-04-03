@@ -1,0 +1,12 @@
+{{- $hostname := promptStringOnce . "hostname" "Hostname" -}}
+{{- $username := promptStringOnce . "username" "Username" -}}
+{{- $has_gpu := promptBoolOnce . "has_gpu" "Does this machine have a GPU?" -}}
+{{- $email := promptStringOnce . "email" "Git email address" -}}
+
+[data]
+    hostname = {{ $hostname | quote }}
+    username = {{ $username | quote }}
+    has_gpu = {{ $has_gpu }}
+    email = {{ $email | quote }}
+    os = "linux"
+    shell = "zsh"

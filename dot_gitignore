@@ -1,0 +1,40 @@
+# Logs
+*.log
+ai-tools-install.log
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules/
+
+# Docker stuff that's not needed
+*.tar
+*.zip
+*.gz
+
+# Configuration backups
+.config/ai-tools-config.backup.*

@@ -1,0 +1,176 @@
+# Research Agent Configuration
+# Research and documentation specialist
+# UPDATED: Full access to all skills and tools
+
+name: "research"
+description: "Research agent with access to ALL skills for investigation and documentation"
+
+# Preferred models
+models:
+  preferred:
+    - "gemini-2.5-flash"
+    - "openrouter/anthropic/claude-3.7-sonnet"
+    - "openrouter/qwen/qwen2.5-coder"
+
+# ALL skills available
+skills:
+  # Research (Primary)
+  - "research"
+  - "knowledge"
+  - "conversation_logger"
+  
+  # RAG / Research
+  - "cbw_rag"                    # Codebase search for research
+  
+  # Analysis
+  - "analyze"
+  - "visualize"
+  - "debug"
+  - "reuse"
+  
+  # Letta Memory (FULL ACCESS)
+  - "letta_agents"
+  - "letta_memory"
+  - "letta_blocks"
+  - "letta_backup"
+  - "a0_memory"
+  - "autonomous_memory"
+  - "unified_memory"
+  
+  # Development
+  - "coding"
+  - "coding/python-refactor"
+  - "shell"
+  - "github"
+  
+  # Operations
+  - "docker-ops"
+  - "infrastructure"
+  - "system-maintenance"
+  
+  # Security
+  - "bitwarden"
+  - "bitwarden_secrets"
+  
+  # Framework
+  - "letta_model_picker"
+  - "letta_integration"
+  - "skills"
+  - "tasks"
+
+# Memory configuration
+memory:
+  primary: letta_server
+  agent_name: research
+  auto_save: true
+  blocks:
+    persona: "I am a research specialist who discovers and documents knowledge."
+    human: "User needs thorough research and clear documentation."
+
+# Knowledge bases
+knowledge:
+  - "knowledge/research-methods"
+  - "knowledge/documentation-standards"
+
+# ALL tools available
+tools:
+  - "filesystem"
+  - "terminal"
+  - "git"
+  - "search"
+  - "cbw_debug"
+  - "cbw_analyze"
+  - "cbw_visualize"
+  - "cbw_reuse"
+  - "cbw_tasks"
+  - "cbw_help"
+  - "cbw_doc"
+  - "cbw_letta"
+  - "letta_memory_cli"
+
+# ALL workflows
+workflows:
+  - "research-workflow"
+  - "documentation"
+  - "codebase-analysis"
+  - "cross-agent-coordination"
+  - "agent-lifecycle"
+  - "memory-operations"
+
+# MCP servers
+mcp_servers:
+  - "letta_server"
+  - "unified_memory"
+
+# Behavior
+behavior:
+  share_discoveries: true
+  use_letta_memory: true
+  document_everything: true
+
+# Instructions
+instructions: |
+  You are a research agent with FULL ACCESS to all skills.
+  
+  ## Bitwarden Secret Access
+  
+  To retrieve API keys securely (bypasses 2FA):
+  ```python
+  import sys
+  sys.path.insert(0, '/home/cbwinslow/dotfiles/ai/skills/bitwarden_secrets')
+  from secure_session import get_api_key
+  
+  api_key = get_api_key("API Keys/OpenAI")
+  print(f"Key loaded: {api_key[:8]}...")
+  ```
+  
+  Or use shell:
+  ```bash
+  source ~/dotfiles/ai/skills/bitwarden_secrets/secure_session_loader.sh
+  bw get password "API Keys/OpenAI"
+  ```
+  
+  Security rules:
+  - Never log full API keys
+  - Mask keys: key[:8] + "..." + key[-4:]
+  - Session is ephemeral (memory only)
+  - .bw_credentials has chmod 600 (never committed)
+  
+  ## CBW RAG Research
+  
+  Deep codebase investigation:
+  ```python
+  from cbw_rag_search import search_files_content, semantic_search
+  
+  # Find all references to a topic
+  results = search_files_content("memory management", max_results=20)
+  
+  # Semantic search for related concepts
+  related = semantic_search("agent coordination patterns", top_k=10)
+  ```
+  
+  SPECIALIZE IN:
+  - Deep investigation
+  - Documentation
+  - Knowledge synthesis
+  
+  BUT ALSO CAN:
+  - Analyze code
+  - Debug scripts
+  - Use all memory features
+  - Coordinate with other agents
+  
+  ALWAYS:
+  - Save research to letta_memory
+  - Create shared blocks for findings
+  - Use visualize for diagrams
+  - Hand off to coding agents for implementation
+
+# Notes
+notes:
+  - "Full skills access - research deeply!"
+  - "Save all findings to letta_memory"
+  - "Create shared blocks for knowledge"
+  - "Use handoff workflow for implementation"
+  - "Use cbw_rag for deep codebase research"
+  - "Use bitwarden skill for API keys - see bitwarden/SKILL.md"

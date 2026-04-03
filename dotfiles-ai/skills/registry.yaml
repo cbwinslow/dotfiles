@@ -1,0 +1,240 @@
+# Skills Registry
+# Centralized catalog of all available skills for AI agents
+# Location: ~/dotfiles/ai/skills/registry.yaml
+
+# Core Skills (Required for all agents)
+core:
+  memory_management:
+    path: skills/memory
+    description: "Letta memory operations - save, search, manage memories"
+    required: true
+    operations:
+      - save_conversation
+      - search_memories
+      - get_memory_stats
+      - delete_memory
+      - update_memory
+      
+  bitwarden_secrets:
+    path: skills/bitwarden
+    description: "Secure secret management via Bitwarden CLI"
+    required: false
+    operations:
+      - get_secret
+      - list_secrets
+      - get_login
+      - generate_password
+      - populate_env
+      
+  entity_extraction:
+    path: skills/integration
+    description: "Extract and store entities from conversations"
+    required: true
+    operations:
+      - extract_entities
+      - store_entities
+      - search_entities
+      
+  conversation_logging:
+    path: skills/memory
+    description: "Automatic conversation logging to Letta"
+    required: true
+    operations:
+      - log_conversation
+      - extract_decisions
+      - extract_action_items
+      
+  cross_agent_search:
+    path: skills/integration
+    description: "Search memories across all agents"
+    required: true
+    operations:
+      - search_all_agents
+      - share_results
+      - request_assistance
+      
+  server_health:
+    path: skills/letta_server
+    description: "Monitor Letta server health"
+    required: true
+    operations:
+      - check_health
+      - get_stats
+      - report_issues
+      
+  bitwarden_integration:
+    path: skills/integration/bitwarden
+    description: "Secure access to Bitwarden credentials and API keys"
+    required: true
+    operations:
+      - get_api_key
+      - populate_env_file
+      - list_vaults
+      - search_credentials
+      - validate_configuration
+
+# Code Skills
+code:
+  code_generation:
+    path: skills/code_generation
+    description: "Generate code in multiple languages"
+    required: false
+    languages:
+      - python
+      - javascript
+      - typescript
+      - bash
+      - sql
+      
+  code_review:
+    path: skills/analysis
+    description: "Review and analyze code quality"
+    required: false
+    
+  refactoring:
+    path: skills/code_generation
+    description: "Refactor and optimize code"
+    required: false
+    
+  debugging:
+    path: skills/analysis
+    description: "Debug and fix code issues"
+    required: false
+
+# Data Skills
+data:
+  data_processing:
+    path: skills/data_processing
+    description: "Process and transform data"
+    required: false
+    formats:
+      - json
+      - csv
+      - xml
+      - yaml
+      
+  data_analysis:
+    path: skills/analysis
+    description: "Analyze data and generate insights"
+    required: false
+    
+  ocr_processing:
+    path: skills/data_processing
+    description: "Extract text from images and PDFs"
+    required: false
+
+# Research Skills
+research:
+  cbw_rag:
+    path: shared/mcp
+    description: "CBW RAG system for semantic search and file indexing"
+    required: true
+    operations:
+      - semantic_search
+      - find_duplicates
+      - similar_code
+      - index_files
+      
+  web_search:
+    path: skills/integration
+    description: "Search the web for information"
+    required: false
+    
+  web_fetch:
+    path: skills/integration
+    description: "Fetch and parse web content"
+    required: false
+    
+  fact_checking:
+    path: skills/analysis
+    description: "Verify facts and claims"
+    required: false
+
+# Writing Skills
+writing:
+  documentation:
+    path: skills/code_generation
+    description: "Write technical documentation"
+    required: false
+    
+  summarization:
+    path: skills/analysis
+    description: "Summarize long content"
+    required: false
+    
+  translation:
+    path: skills/data_processing
+    description: "Translate between languages"
+    required: false
+
+# System Skills
+system:
+  file_system:
+    path: tools/cli_tools
+    description: "File system operations"
+    required: true
+    
+  terminal:
+    path: tools/cli_tools
+    description: "Execute terminal commands"
+    required: true
+    
+  git_operations:
+    path: tools/cli_tools
+    description: "Git version control operations"
+    required: false
+    
+  process_management:
+    path: tools/utility_tools
+    description: "Manage system processes"
+    required: false
+
+# Letta Integration Skills
+letta:
+  letta_memory:
+    path: skills/letta_memory
+    description: "Unified Letta memory operations - core, archival, cross-agent search"
+    required: true
+    operations:
+      - before_task
+      - after_task
+      - store_fact
+      - recall
+      - update_block
+      - view_blocks
+      - cross_agent_search
+      - health_check
+
+  letta_workflows:
+    path: skills/letta_workflows
+    description: "Stateful workflow automation backed by Letta memory"
+    required: false
+    operations:
+      - start_workflow
+      - update_step
+      - check_status
+      - resume_workflow
+      - log_decision
+      - handoff
+
+  cross_agent_coordinator:
+    path: skills/cross_agent_coordinator
+    description: "Multi-agent coordination via shared Letta memory"
+    required: true
+    operations:
+      - post_finding
+      - request_help
+      - search_knowledge
+      - share_config_change
+      - register_task_completion
+
+  knowledge_base:
+    path: skills/knowledge_base
+    description: "Structured knowledge capture and retrieval from Letta"
+    required: false
+    operations:
+      - store_knowledge
+      - search_knowledge
+      - store_decision
+      - store_runbook
+      - store_adr
