@@ -25,6 +25,7 @@ on:
           - openclaw
           - gemini
           - qwen
+          - codex
           - vscode
           - windsurf
 
@@ -61,7 +62,7 @@ jobs:
       - name: Detect changed or targeted agents
         id: detect
         run: |
-          AGENTS=(kilocode opencode cline openclaw gemini qwen vscode windsurf)
+          AGENTS=(kilocode opencode cline openclaw gemini qwen codex vscode windsurf)
           TARGET="${{ github.event.inputs.agent }}"
 
           if [[ -n "$TARGET" ]]; then
@@ -76,7 +77,7 @@ jobs:
           import sys, yaml
           from pathlib import Path
 
-          agents = ["kilocode","opencode","cline","openclaw","gemini","qwen","vscode","windsurf"]
+          agents = ["kilocode","opencode","cline","openclaw","gemini","qwen","codex","vscode","windsurf"]
           base   = Path("dotfiles/ai/agents")
           errors = []
 
