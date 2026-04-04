@@ -199,5 +199,9 @@ key.txt.age
 # --- Epstein project data (too large, separate data repo) -------------------
 epstein-data/
 
+# --- Local AI deployment (contains API keys) -------------------------------
+infra/local-ai/
+infra/letta/docker-compose.letta.yml
+
 # --- Codex plugins (may contain API keys) -----------------------------------
 private_dot_config/private_codex/
