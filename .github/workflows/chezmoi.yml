@@ -6,17 +6,18 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Setup Chezmoi
         run: |
           curl -sfL https://get.chezmoi.io | sh
           ~/bin/chezmoi doctor
           
-      - name: Validate Configuration
+      - name: Validate Configuration (dry-run)
         run: |
-          ~/bin/chezmoi diff
-          ~/bin/chezmoi verify
+          # Dry-run apply to check for syntax errors and template issues
+          ~/bin/chezmoi apply --dry-run
+          # Doctor checks system compatibility
           ~/bin/chezmoi doctor
       
       - name: Check for secrets
