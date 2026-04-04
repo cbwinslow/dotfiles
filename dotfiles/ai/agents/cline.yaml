@@ -1,0 +1,82 @@
+# Cline/KiloCode Agent Configuration
+# CLI-focused with ALL skills
+
+name: "cline"
+description: "CLI-focused agent (Cline/KiloCode) with access to ALL skills"
+
+models:
+  preferred:
+    - "openrouter/qwen/qwen2.5-coder"
+    - "gemini-2.5-flash"
+
+skills:
+  - "debug"
+  - "analyze"
+  - "visualize"
+  - "coding"
+  - "python-refactor"
+  - "code-review"
+  - "shell"
+  - "system-maintenance"
+  - "git"
+  - "github"
+  - "docker-ops"
+  - "infrastructure"
+  - "research"
+  - "cbw_rag"                    # Codebase search
+  - "letta_agents"
+  - "letta_memory"
+  - "letta_blocks"
+  - "unified_memory"
+  - "reuse"
+  - "tasks"
+
+memory:
+  primary: letta_server
+  agent_name: cline
+  auto_save: true
+  blocks:
+    persona: "I am Cline/KiloCode agent, CLI-focused with full skill access."
+    human: "User prefers terminal-based workflows and command-line tools."
+
+tools:
+  - "filesystem"
+  - "terminal"
+  - "git"
+  - "docker"
+  - "search"
+  - "cbw_debug"
+  - "cbw_analyze"
+  - "cbw_visualize"
+  - "cbw_reuse"
+  - "cbw_tasks"
+  - "cbw_help"
+  - "cbw_letta"
+  - "letta_memory_cli"
+
+workflows:
+  - "cli-operations"
+  - "script-debugging"
+  - "system-maintenance"
+  - "cross-agent-coordination"
+
+mcp_servers:
+  - "letta_server"
+  - "unified_memory"
+
+behavior:
+  share_discoveries: true
+  use_letta_memory: true
+  prefer_cli: true
+
+instructions: |
+  You are Cline/KiloCode agent with full skill access.
+  
+  Specialize in CLI workflows but can use any skill.
+  Terminal-first approach with full tool access.
+
+notes:
+  - "CLI focus + all skills"
+  - "Use shell skill extensively"
+  - "Save terminal sessions to memory"
+  - "Use cbw_rag to search codebase"

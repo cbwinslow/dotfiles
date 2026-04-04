@@ -1,0 +1,10 @@
+- [x] Check prerequisites (node, pnpm, docker)
+- [x] Build Docker image
+- [x] Configure environment variables
+- [x] Run openclaw with docker-compose
+- [ ] Verify service is running on port 18789
+- [ ] Configure openclaw (setup wizard or mode=local)
+- [x] Install Tailscale on server
+- [x] Login to Tailscale to get Tailscale IP
+- [ ] Access openclaw from Windows machine via Tailscale IP
+- [ ] Optionally configure reverse proxy or firewall

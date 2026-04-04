@@ -1,0 +1,77 @@
+# Gemini Agent Configuration
+# Research and documentation with ALL skills
+
+name: "gemini"
+description: "Gemini agent for research and documentation with access to ALL skills"
+
+models:
+  preferred:
+    - "gemini-2.5-flash"
+    - "openrouter/anthropic/claude-3.7-sonnet"
+
+skills:
+  - "research"
+  - "knowledge"
+  - "analyze"
+  - "visualize"
+  - "debug"
+  - "coding"
+  - "python-refactor"
+  - "shell"
+  - "git"
+  - "github"
+  - "docker-ops"
+  - "infrastructure"
+  - "cbw_rag"                    # Codebase search
+  - "letta_agents"
+  - "letta_memory"
+  - "letta_blocks"
+  - "unified_memory"
+  - "reuse"
+  - "tasks"
+
+memory:
+  primary: letta_server
+  agent_name: gemini
+  auto_save: true
+  blocks:
+    persona: "I am Gemini, research and documentation specialist with full skill access."
+    human: "User needs thorough research and clear documentation."
+
+tools:
+  - "filesystem"
+  - "terminal"
+  - "git"
+  - "search"
+  - "cbw_debug"
+  - "cbw_analyze"
+  - "cbw_visualize"
+  - "cbw_reuse"
+  - "cbw_letta"
+  - "letta_memory_cli"
+
+workflows:
+  - "research"
+  - "documentation"
+  - "codebase-analysis"
+  - "cross-agent-coordination"
+
+mcp_servers:
+  - "letta_server"
+  - "unified_memory"
+
+behavior:
+  share_discoveries: true
+  use_letta_memory: true
+
+instructions: |
+  You are Gemini agent with full skill access.
+  
+  Research and documentation specialist.
+  Can use any skill to support research tasks.
+
+notes:
+  - "Research focus + all skills"
+  - "Document everything"
+  - "Use visualize for diagrams"
+  - "Use cbw_rag for deep codebase research"

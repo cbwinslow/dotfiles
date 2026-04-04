@@ -1,5 +1,18 @@
 # =============================================================================
-# Chezmoi Ignore Patterns
+# Chezmoi Ignore Patterns — AI-First Configuration
+# =============================================================================
+# Philosophy: Track EVERYTHING by default. Only exclude runtime caches,
+# auth tokens, large binaries, and machine-specific ephemeral data.
+#
+# AI agent skills, rules, memories, workflows, agents.md, configs, and
+# dotfiles are all first-class assets. They represent significant time
+# investment and must be version controlled.
+#
+# Based on industry standards:
+# - dotwee: One Skills Brain with chezmoi (DEV.to 2026)
+# - BSWEN: Version Control AI Assistant Config (2026)
+# - rymiwe: Claude Code Config Backup with chezmoi (GitHub Gist 2026)
+# - chezmoi official docs: AI coding agent configuration (twpayne/chezmoi)
 # =============================================================================
 
 # --- Build artifacts & caches -----------------------------------------------
@@ -32,6 +45,12 @@
 **/*.ckpt
 **/*.mlmodel
 **/*.pb
+**/*.mp4
+**/*.mp3
+**/*.wav
+**/*.zip
+**/*.tar.gz
+**/*.tgz
 
 # --- Git internals ----------------------------------------------------------
 **/.git/
@@ -45,7 +64,6 @@
 
 # --- IDE & editor runtime ---------------------------------------------------
 **/.idea/
-**/.vscode/settings.json
 **/.vscode/sync/
 **/.vscode/cstate*
 **/.vscode/db-*
@@ -66,6 +84,7 @@
 **/*.swo
 **/*~
 **/*.bak
+**/*.backup.*
 
 # --- Terraform & IaC state --------------------------------------------------
 **/.terraform/
@@ -83,9 +102,14 @@
 **/models/
 **/weights/
 
-# --- Runtime-generated data -------------------------------------------------
-dotfiles-ai/backups/
-dotfiles-ai/logs/
+# =========================================================================
+# AI AGENT CONFIGURATION — WHAT TO EXCLUDE
+# =========================================================================
+# We track: skills, rules, memories, workflows, agents.md, configs,
+#           instructions, prompts, commands, extensions, dotfiles
+# We exclude: auth tokens, session data, caches, sqlite databases,
+#             runtime state, large model caches
+# =========================================================================
 
 # --- Secret files (use age encryption or password manager) -------------------
 **/*.pem
@@ -96,14 +120,17 @@ dotfiles-ai/logs/
 **/.bw_credentials
 **/.bw_master_password
 **/.env
-**/.env.*
 **/secrets.json
 **/auth.json
 **/api_keys.*
 **/credentials.*
 key.txt.age
 
-# --- Cline runtime data -----------------------------------------------------
+# --- OAuth / session tokens (regenerable, machine-specific) -----------------
+**/oauth_creds.json
+**/google_accounts.json
+
+# --- Cline — EXCLUDE runtime data, TRACK everything else --------------------
 **/.cline/data/sessions/
 **/.cline/data/tasks/
 **/.cline/data/workspaces/
@@ -115,73 +142,59 @@ key.txt.age
 **/.cline/data/sessions.db*
 **/.cline/ide/*.lock
 
-# --- Codex runtime data -----------------------------------------------------
+# --- Codex — EXCLUDE runtime data, TRACK everything else --------------------
 **/.codex/logs_*.sqlite*
 **/.codex/state_*.sqlite
-**/.codex/auth.json
 **/.codex/.tmp/
 **/.codex/memories/
 **/.codex/plugins/
 **/.codex/tmp/
-**/.codex/.tmp/
 **/.codex/skills.backup*/
 **/.codex/models_cache.json
 
-# --- KiloCode runtime data --------------------------------------------------
-**/.kilocode/node_modules/
-**/.kilocode/bun.lock
-**/.kilocode/package-lock.json
-
-# --- OpenCode runtime data --------------------------------------------------
+# --- OpenCode — EXCLUDE runtime data, TRACK everything else -----------------
 **/.opencode/node_modules/
 **/.opencode/bun.lock
 **/.opencode/package-lock.json
-**/.opencode/agents/
 **/.opencode/bin/
 **/.opencode/data/
 **/.opencode/skill/
 
-# --- Config/opencode runtime ------------------------------------------------
+# --- Config/opencode — EXCLUDE runtime, TRACK configs -----------------------
 **/.config/opencode/node_modules/
 **/.config/opencode/bun.lock
 **/.config/opencode/package-lock.json
 
-# --- Gemini runtime data ----------------------------------------------------
+# --- Gemini — EXCLUDE history/tokens, TRACK settings ------------------------
 **/.gemini/history/
 **/.gemini/tmp/
-**/.gemini/oauth_creds.json
-**/.gemini/google_accounts.json
 
-# --- Qwen runtime data ------------------------------------------------------
+# --- Qwen — EXCLUDE runtime data, TRACK configs -----------------------------
 **/.qwen/projects/
 **/.qwen/tmp/
 **/.qwen/debug/
 **/.qwen/todos/
-**/.qwen/oauth_creds.json
 
-# --- Windsurf / Codeium runtime data ----------------------------------------
+# --- Windsurf / Codeium — EXCLUDE runtime -----------------------------------
 **/.codeium/windsurf/memories/*.pb
 **/.codeium/windsurf/installation_id
 **/.codeium/windsurf/native_storage_migrations.lock
 **/.codeium/windsurf/code_tracker/
 
-# --- Cursor runtime data ----------------------------------------------------
-**/.cursor/skills/**/__pycache__/
-
-# --- Roo runtime data -------------------------------------------------------
-**/.roo/skills/
-
-# --- Crush runtime data -----------------------------------------------------
-**/.crush/skills/
-
-# --- OpenHands runtime data -------------------------------------------------
-**/.openhands/skills/
-
-# --- Antigravity server (runtime) -------------------------------------------
-**/.antigravity-server/
-
 # --- Letta runtime data -----------------------------------------------------
 **/.letta/logs/
+
+# --- Antigravity server (runtime binary) ------------------------------------
+**/.antigravity-server/
+
+# --- Rust toolchain (managed by rustup) -------------------------------------
+**/.rustup/
+
+# --- NVM (managed separately) -----------------------------------------------
+**/.nvm/
+
+# --- Bun cache --------------------------------------------------------------
+**/.bun/install/
 
 # --- Epstein project data (too large, separate data repo) -------------------
 epstein-data/

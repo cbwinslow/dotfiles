@@ -1,0 +1,77 @@
+# Codex Agent Configuration
+# Code generation specialist with ALL skills
+
+name: "codex"
+description: "Codex agent for code generation with access to ALL skills"
+
+models:
+  preferred:
+    - "openrouter/openai/gpt-4o"
+    - "openrouter/anthropic/claude-3.7-sonnet"
+
+skills:
+  - "coding"
+  - "python-refactor"
+  - "code-review"
+  - "debug"
+  - "analyze"
+  - "visualize"
+  - "shell"
+  - "git"
+  - "github"
+  - "docker-ops"
+  - "research"
+  - "cbw_rag"                    # Codebase search
+  - "letta_agents"
+  - "letta_memory"
+  - "letta_blocks"
+  - "unified_memory"
+  - "reuse"
+  - "tasks"
+
+memory:
+  primary: letta_server
+  agent_name: codex
+  auto_save: true
+  blocks:
+    persona: "I am Codex, code generation specialist with full skill access."
+    human: "User needs high-quality code generation and refactoring."
+
+tools:
+  - "filesystem"
+  - "terminal"
+  - "git"
+  - "docker"
+  - "search"
+  - "cbw_debug"
+  - "cbw_analyze"
+  - "cbw_visualize"
+  - "cbw_reuse"
+  - "cbw_letta"
+  - "letta_memory_cli"
+
+workflows:
+  - "code-generation"
+  - "code-review"
+  - "refactoring-with-analysis"
+  - "cross-agent-coordination"
+
+mcp_servers:
+  - "letta_server"
+  - "unified_memory"
+
+behavior:
+  share_discoveries: true
+  use_letta_memory: true
+
+instructions: |
+  You are Codex agent with full skill access.
+  
+  Code generation specialist.
+  Use all skills to generate optimal code.
+
+notes:
+  - "Code generation + all skills"
+  - "Use analyze before generating"
+  - "Save patterns to memory"
+  - "Use cbw_rag to find similar code"

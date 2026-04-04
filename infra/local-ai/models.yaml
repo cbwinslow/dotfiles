@@ -1,0 +1,98 @@
+# LocalAI Model Configuration
+# This file defines models available to LocalAI
+
+# Ollama Models (using llama.cpp backend)
+- name: llama3.1:8b
+  backend: llama.cpp
+  model_file: llama3.1-8b-instruct-q4_0.gguf
+  threads: 8
+  context_size: 8192
+  f16: true
+
+- name: llama2
+  backend: llama.cpp
+  model_file: llama2-7b-chat.Q4_0.gguf
+  threads: 8
+  context_size: 4096
+
+- name: llama3.2
+  backend: llama.cpp
+  model_file: llama3.2-1b-instruct-q4_0.gguf
+  threads: 8
+  context_size: 4096
+
+- name: deepseek-r1:70b
+  backend: llama.cpp
+  model_file: deepseek-r1-70b-chat-q4_k_m.gguf
+  threads: 8
+  context_size: 8192
+
+- name: qwen3-coder-next
+  backend: llama.cpp
+  model_file: qwen3-coder-next-32b-instruct-q4_k_m.gguf
+  threads: 8
+  context_size: 8192
+
+- name: gemma3:4b
+  backend: llama.cpp
+  model_file: gemma-3-4b-it-q4_k_m.gguf
+  threads: 8
+  context_size: 4096
+
+# Embedding Models
+- name: nomic-embed-text
+  backend: llama.cpp
+  model_file: nomic-embed-text-v1.5.f16.gguf
+  threads: 8
+  embeddings: true
+  context_size: 2048
+
+- name: bge-m3
+  backend: llama.cpp
+  model_file: bge-m3-Q4_0.gguf
+  threads: 8
+  embeddings: true
+  context_size: 2048
+
+- name: qwen3-embedding
+  backend: llama.cpp
+  model_file: qwen3-embedding-q4_k_m.gguf
+  threads: 8
+  embeddings: true
+  context_size: 2048
+
+# External API Models (OpenRouter, Groq, Gemini)
+# These are configured via environment variables and accessed via OpenAI-compatible API
+
+# OpenRouter Models
+- name: openrouter/claude-3.5-sonnet
+  backend: openai
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+  model: claude-3.5-sonnet
+
+- name: openrouter/gpt-4o
+  backend: openai
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+  model: gpt-4o
+
+# Groq Models
+- name: groq/llama-3.1-70b
+  backend: openai
+  api_key: ${GROQ_API_KEY}
+  base_url: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+  model: llama-3.1-70b-versatile
+
+- name: groq/llama-3.1-8b
+  backend: openai
+  api_key: ${GROQ_API_KEY}
+  base_url: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+  model: llama-3.1-8b-instant
+
+# Gemini Models
+- name: gemini/gemini-pro
+  backend: openai
+  api_key: ${GOOGLE_API_KEY}
+  base_url: ${GEMINI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta}
+  model: gemini-1.5-pro

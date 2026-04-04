@@ -1,0 +1,10 @@
+# Secrets directory - NEVER commit
+secrets/
+
+# Bitwarden credentials
+.bw_credentials
+.bw_master_password
+*bw*password*
+
+# Session keys
+*.session
