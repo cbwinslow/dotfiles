@@ -1,0 +1,49 @@
+# Conversation Logger Configuration
+# Copy to ~/.conversation_logger/config.yaml and customize
+
+letta:
+  # Letta server settings
+  server_url: "http://localhost:8283"
+  agent_id: "agent-1167f15a-a10a-4595-b962-ec0f372aae0d"
+  agent_name: "coder"
+
+logging:
+  # Logging configuration
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "~/.conversation_logger/conversation_logger.log"
+  max_log_size_mb: 10
+  backup_count: 5
+
+processing:
+  # Conversation processing settings
+  max_summary_length: 1000
+  key_decision_keywords:
+    - "decision:"
+    - "conclusion:"
+    - "we will"
+    - "going to"
+    - "let's"
+    - "plan:"
+    - "action item:"
+    - "todo:"
+    - "next step:"
+  auto_extract_tags: true
+  max_tags: 10
+
+storage:
+  # Archive settings
+  archive_dir: "~/.conversation_logger/archives"
+  max_archive_days: 30
+  compress_old_logs: true
+
+monitoring:
+  # File watching settings
+  watch_directories:
+    - "~/workspace"
+    - "/tmp"
+  file_patterns:
+    - "*.md"
+    - "*.txt"
+    - "*.log"
+  check_interval_seconds: 60
+  max_file_size_mb: 10  # Skip files larger than this

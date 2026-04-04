@@ -1,0 +1,67 @@
+name: letta_server
+version: 1.0.0
+description: Shared Letta server skill for AI agent memory management
+
+environment:
+  LETTA_URL: http://localhost:8283
+  LETTA_SERVER_PASSWORD: 123qweasd
+
+functions:
+  store_agent_context:
+    description: Store agent context in Letta
+    parameters:
+      agent_id:
+        type: string
+        description: Agent identifier
+      context:
+        type: object
+        description: Context data to store
+    returns:
+      success:
+        type: boolean
+        description: Whether operation succeeded
+
+  store_memory_block:
+    description: Store reusable memory block
+    parameters:
+      label:
+        type: string
+        description: Memory block label
+      value:
+        type: string
+        description: Memory block content
+    returns:
+      success:
+        type: boolean
+        description: Whether operation succeeded
+
+  archival_insert:
+    description: Store archival memory
+    parameters:
+      agent_id:
+        type: string
+        description: Agent identifier
+      text:
+        type: string
+        description: Memory content
+      tags:
+        type: array
+        description: Memory tags
+    returns:
+      success:
+        type: boolean
+        description: Whether operation succeeded
+
+  archival_search:
+    description: Search archival memories
+    parameters:
+      agent_id:
+        type: string
+        description: Agent identifier
+      query:
+        type: string
+        description: Search query
+    returns:
+      results:
+        type: array
+        description: Search results

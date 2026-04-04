@@ -1,9 +1,6 @@
 # =============================================================================
 # Chezmoi Ignore Patterns
 # =============================================================================
-# Files matching these patterns will NOT be managed by chezmoi.
-# Organized by category for maintainability.
-# =============================================================================
 
 # --- Build artifacts & caches -----------------------------------------------
 **/__pycache__/
@@ -89,12 +86,8 @@
 # --- Runtime-generated data -------------------------------------------------
 dotfiles-ai/backups/
 dotfiles-ai/logs/
-dotfiles-ai/validation_report.json
-dotfiles-ai/system_config.json
 
 # --- Secret files (use age encryption or password manager) -------------------
-# NOTE: SSH keys are encrypted with age and stored as encrypted_*.
-# Raw unencrypted secret files are still ignored.
 **/*.pem
 **/*.key
 **/id_rsa
@@ -110,7 +103,7 @@ dotfiles-ai/system_config.json
 **/credentials.*
 key.txt.age
 
-# --- Cline / Claude Code runtime data ---------------------------------------
+# --- Cline runtime data -----------------------------------------------------
 **/.cline/data/sessions/
 **/.cline/data/tasks/
 **/.cline/data/workspaces/
@@ -127,6 +120,12 @@ key.txt.age
 **/.codex/state_*.sqlite
 **/.codex/auth.json
 **/.codex/.tmp/
+**/.codex/memories/
+**/.codex/plugins/
+**/.codex/tmp/
+**/.codex/.tmp/
+**/.codex/skills.backup*/
+**/.codex/models_cache.json
 
 # --- KiloCode runtime data --------------------------------------------------
 **/.kilocode/node_modules/
@@ -134,9 +133,31 @@ key.txt.age
 **/.kilocode/package-lock.json
 
 # --- OpenCode runtime data --------------------------------------------------
+**/.opencode/node_modules/
+**/.opencode/bun.lock
+**/.opencode/package-lock.json
+**/.opencode/agents/
+**/.opencode/bin/
+**/.opencode/data/
+**/.opencode/skill/
+
+# --- Config/opencode runtime ------------------------------------------------
 **/.config/opencode/node_modules/
 **/.config/opencode/bun.lock
 **/.config/opencode/package-lock.json
+
+# --- Gemini runtime data ----------------------------------------------------
+**/.gemini/history/
+**/.gemini/tmp/
+**/.gemini/oauth_creds.json
+**/.gemini/google_accounts.json
+
+# --- Qwen runtime data ------------------------------------------------------
+**/.qwen/projects/
+**/.qwen/tmp/
+**/.qwen/debug/
+**/.qwen/todos/
+**/.qwen/oauth_creds.json
 
 # --- Windsurf / Codeium runtime data ----------------------------------------
 **/.codeium/windsurf/memories/*.pb
@@ -147,34 +168,23 @@ key.txt.age
 # --- Cursor runtime data ----------------------------------------------------
 **/.cursor/skills/**/__pycache__/
 
-# --- Placeholder files (empty or auto-generated) ----------------------------
-**/agents.md
+# --- Roo runtime data -------------------------------------------------------
+**/.roo/skills/
+
+# --- Crush runtime data -----------------------------------------------------
+**/.crush/skills/
+
+# --- OpenHands runtime data -------------------------------------------------
+**/.openhands/skills/
+
+# --- Antigravity server (runtime) -------------------------------------------
+**/.antigravity-server/
+
+# --- Letta runtime data -----------------------------------------------------
+**/.letta/logs/
 
 # --- Epstein project data (too large, separate data repo) -------------------
 epstein-data/
 
-# Cline runtime data (contains API keys in conversation history)
-dotfiles-ai/.cline/data/tasks/
-dotfiles-ai/.cline/data/sessions/
-dotfiles-ai/.cline/data/workspaces/
-dotfiles-ai/.cline/data/settings/
-dotfiles-ai/.cline/data/cache/
-dotfiles-ai/.cline/data/globalState.json
-dotfiles-ai/.cline/kanban/
-dotfiles-ai/.cline/data/sessions.db*
-
-# Codex plugins (may contain API keys)
-private_dot_config/private_codex/
-
-# Cline runtime data (contains API keys in conversation history)
-dotfiles-ai/.cline/data/tasks/
-dotfiles-ai/.cline/data/sessions/
-dotfiles-ai/.cline/data/workspaces/
-dotfiles-ai/.cline/data/settings/
-dotfiles-ai/.cline/data/cache/
-dotfiles-ai/.cline/data/globalState.json
-dotfiles-ai/.cline/kanban/
-dotfiles-ai/.cline/data/sessions.db*
-
-# Codex plugins (may contain API keys)
+# --- Codex plugins (may contain API keys) -----------------------------------
 private_dot_config/private_codex/

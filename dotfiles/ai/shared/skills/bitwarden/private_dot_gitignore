@@ -1,0 +1,44 @@
+# Bitwarden Skill - File Exclusions
+
+# Never commit environment files with secrets
+.env
+.env.bak.*
+.env.*.bak
+
+# Session files (contain BW_SESSION tokens)
+.config/bitwarden-ai/
+session.env
+*.session
+
+# Credentials and secrets
+.bw_credentials
+*.password
+*.secret
+*.key
+bw_session*
+
+ # Mapping files may contain sensitive item names
+ bitwarden-env-map.json
+ bitwarden-secrets.json
+ # Allow example templates in examples/ directory
+ !examples/bitwarden-env-map.json
+
+# Backup files
+*.bak
+*.backup
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+
+# Temporary files
+mktemp*
+tmp*
+
+# OS files
+.DS_Store
+Thumbs.db

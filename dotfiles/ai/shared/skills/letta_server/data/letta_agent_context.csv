@@ -1,0 +1,9 @@
+id,agent_name,context_key,context_value,created_at,updated_at
+1,epstein_processor,last_dataset,dataset_8,2026-03-23 03:27:34.978208,2026-03-23 03:27:34.978208
+2,epstein_processor,files_processed,1000,2026-03-23 03:27:35.014301,2026-03-23 03:27:35.014301
+3,epstein_processor,total_pages,2477,2026-03-23 03:27:35.049861,2026-03-23 03:27:35.049861
+4,epstein_processor,entities_extracted,47901,2026-03-23 03:27:35.085802,2026-03-23 03:27:35.085802
+5,epstein_processor,verification_status,"{""file_registry_script"": ""completed"", ""testing_status"": ""passed"", ""next_step"": ""full_population"", ""expected_duration_minutes"": 45, ""last_updated"": ""2026-03-23T14:33:23.177934""}",2026-03-23 14:33:23.198736,2026-03-23 14:33:23.198736
+6,epstein_processor,current_focus,file_registry_verification,2026-03-23 14:33:23.227765,2026-03-23 14:33:23.227765
+7,opencode_planning,latest_conversation,"{""session_id"": ""ses_2f34bba79ffeGP4HXMqiQr341K"", ""title"": ""DOJ Epstein datasets download and knowledge graph plan"", ""timestamp"": ""2026-03-24T02:18:43.825456"", ""memory_id"": 11}",2026-03-24 02:18:43.845815,2026-03-24 02:18:43.845815
+8,system_admin,last_conversation,"{""memory_id"": 16, ""timestamp"": ""2026-03-24T05:06:09.093143"", ""length"": 6}",2026-03-24 05:06:09.112386,2026-03-24 05:06:09.112386

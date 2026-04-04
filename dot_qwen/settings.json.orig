@@ -1,0 +1,29 @@
+{
+  "security": {
+    "auth": {
+      "selectedType": "qwen-oauth"
+    }
+  },
+  "model": {
+    "name": "coder-model"
+  },
+  "permissions": {
+    "allow": [
+      "WebFetch(github.com)",
+      "WebFetch(letta.com)",
+      "WebFetch(openrouter.ai)",
+      "Bash(mkdir *)",
+      "Bash(pip install *)",
+      "Bash(bash *)",
+      "Bash(file *)",
+      "Bash(python3 *)",
+      "Bash(cline *)",
+      "Bash(opencode *)",
+      "Bash(readlink *)",
+      "Bash(kilocode *)",
+      "Bash(gemini *)",
+      "Bash(openclaw *)",
+      "Bash(chmod *)"
+    ]
+  }
+}

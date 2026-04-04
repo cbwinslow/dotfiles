@@ -1,0 +1,31 @@
+{
+  "packages": {
+    "epstein_memory": false
+  },
+  "configurations": {
+    "global": true
+  },
+  "memory_system": {
+    "basic_functionality": false
+  },
+  "agents": {
+    "opencode": true,
+    "gemini": true,
+    "claude": true
+  },
+  "frameworks": {
+    "langchain": true,
+    "crewai": true,
+    "autogen": true
+  },
+  "network": {
+    "basic_setup": true
+  },
+  "overall": {
+    "status": "CRITICAL",
+    "score": 57.14285714285714,
+    "total_checks": 7,
+    "passed_checks": 4
+  },
+  "environment": false
+}

@@ -1,0 +1,25 @@
+[Unit]
+Description=OpenClaw Gateway Service
+After=network.target tailscaled.service
+Wants=tailscaled.service
+
+[Service]
+Type=simple
+User=cbwinslow
+Group=cbwinslow
+WorkingDirectory=/home/cbwinslow/.openclaw
+ExecStart=/home/cbwinslow/.nvm/versions/node/v24.14.0/bin/openclaw gateway run --bind lan --port 18789
+Restart=on-failure
+RestartSec=10
+
+# Environment
+Environment=HOME=/home/cbwinslow
+Environment=PATH=/home/cbwinslow/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw-gateway
+
+[Install]
+WantedBy=multi-user.target
