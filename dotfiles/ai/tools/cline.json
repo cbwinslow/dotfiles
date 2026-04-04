@@ -1,0 +1,68 @@
+{
+  "$schema": "https://docs.cline.bot/cli/config-schema.json",
+  "version": "1.0.0",
+  
+  "modelProvider": "openrouter",
+  "model": "openrouter/qwen/qwen2.5-coder",
+  
+  "openrouter": {
+    "apiKeyEnv": "OPENROUTER_API_KEY",
+    "baseUrl": "https://openrouter.ai/api/v1"
+  },
+  
+  "skillsDir": "~/.config/ai/skills",
+  "workflowsDir": "~/.config/ai/workflows",
+  "agentsDir": "~/.config/ai/agents",
+  
+  "defaultAgent": "coding",
+  "defaultAgentConfig": "~/.config/ai/agents/coding.yaml",
+  
+  "logsDir": "~/.local/state/ai/logs/cline",
+  
+  "mcpServers": {
+    "bitwarden": {
+      "command": "npx",
+      "args": ["-y", "@bitwarden/mcp-server"],
+      "env": {
+        "BW_SESSION": "${BW_SESSION}"
+      }
+    },
+    "cbw_rag": {
+      "command": "python3",
+      "args": ["~/.config/ai/shared/mcp/rag_server.py"],
+      "env": {
+        "CBW_RAG_DATABASE": "${CBW_RAG_DATABASE}",
+        "CBW_RAG_OLLAMA_URL": "${CBW_RAG_OLLAMA_URL:-http://localhost:8081}",
+        "CBW_RAG_EMBEDDING_MODEL": "${CBW_RAG_EMBEDDING_MODEL:-nomic-embed-text}"
+      }
+    }
+  },
+  
+  "workflows": {
+    "enabled": true,
+    "autoLoadFromDir": "~/.config/ai/workflows"
+  },
+  
+  "skills": {
+    "enabled": true,
+    "autoLoadFromDir": "~/.config/ai/skills"
+  },
+  
+  "behavior": {
+    "allowShell": true,
+    "allowNetwork": true,
+    "requireApprovalForDestructive": true,
+    "autoSaveConversations": true,
+    "searchMemoryFirst": true
+  },
+  
+  "paths": {
+    "allowed": [
+      "/home/cbwinslow/workspace",
+      "/home/cbwinslow/dotfiles",
+      "/home/cbwinslow/infra",
+      "/home/cbwinslow/projects"
+    ],
+    "blocked": []
+  }
+}

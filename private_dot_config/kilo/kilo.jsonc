@@ -1,0 +1,21 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "permission": {
+    "bash": {
+      "bun add *": "allow",
+      "gh issue comment *": "allow",
+      "withTeamContext *": "allow",
+      "current_team *": "allow",
+      "grep *": "allow",
+      "tail *": "allow",
+      "/home/cbwinslow/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh *": "allow",
+      "head *": "allow",
+      "bun build *": "allow",
+      "which *": "allow",
+      "fnm *": "allow",
+      "echo *": "allow",
+      "bun run scripts/test-claude-parser.ts *": "allow",
+      "bun test *": "allow"
+    }
+  }
+}

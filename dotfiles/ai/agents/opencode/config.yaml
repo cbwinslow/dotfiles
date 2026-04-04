@@ -1,0 +1,65 @@
+# OpenCode Agent Configuration
+# Location: ~/dotfiles/ai/agents/opencode/config.yaml
+# Inherits from: ~/dotfiles/ai/base/base_agent.yaml
+
+# ★ Shared Resources - Centralized for all agents ★
+shared_resources:
+  skills_path: ~/dotfiles/ai/shared/skills
+  tools_path: ~/dotfiles/ai/shared/tools
+  scripts_path: ~/dotfiles/ai/shared/scripts
+  mcp_servers_path: ~/dotfiles/ai/shared/mcp
+  docs_path: ~/dotfiles/ai/shared/docs
+
+# Agent-specific settings (overrides base config)
+extends: ../../base/base_agent.yaml
+
+name: opencode_agent
+framework: langchain
+
+# OpenCode-specific tools (in addition to base tools)
+tools:
+  - file_system
+  - git
+  - terminal
+  - search
+  - web_fetch
+  - cbw_rag.semantic_search
+  - cbw_rag.find_duplicates
+  - cbw_rag.similar_code
+  - cbw_rag.index_files
+  - letta_server.store_conversation
+  - letta_server.search_memories
+  - letta_server.get_memory_stats
+  - letta_server.check_server_health
+  - letta_server.setup_agent_memory
+  - letta_server.sync_agent_context
+
+# OpenCode-specific skills
+skills:
+  - code_generation
+  - git_operations
+  - cli_operations
+  - memory_management
+  - conversation_logging
+  - memory_sync
+  - cbw_rag_query
+  - cbw_find_duplicates
+  - cbw_similar_code
+
+# Processing overrides for OpenCode
+processing:
+  max_concurrent_tasks: 5
+  timeout_seconds: 300
+  batch_size: 10
+
+# Context settings for coding
+context:
+  max_context_length: 10000
+  auto_save_interval: 300
+
+# Security settings specific to OpenCode
+security:
+  allowed_paths:
+    - /home/cbwinslow/workspace
+    - /home/cbwinslow/dotfiles
+    - /home/cbwinslow/infra

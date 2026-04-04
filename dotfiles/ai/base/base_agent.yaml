@@ -1,0 +1,218 @@
+# Base Agent Configuration
+# All AI agents inherit from this configuration
+# Location: ~/dotfiles/ai/base/base_agent.yaml
+
+# Core Settings
+provider: openrouter
+model: openrouter/free
+memory_backend: letta_server
+
+# Model Picker Configuration (GPU-enabled llama.cpp and Ollama support)
+model_picker:
+  # Available presets: fast_gpu, quality_gpu, cpu_fallback, ollama_standard, letta_free
+  default_preset: "ollama_standard"
+  
+  # GPU Configuration for llama.cpp models
+  gpu:
+    enabled: true  # Auto-detect GPU, fallback to CPU if not available
+    n_gpu_layers: 35  # Number of layers to offload to GPU (0-99)
+    main_gpu: 0  # Primary GPU device ID
+    tensor_split: []  # Multi-GPU memory split ratios
+    
+  # LLM Model Configuration
+  llm:
+    provider: "ollama"  # Options: llama.cpp, ollama, openrouter, letta-free
+    model_name: "llama3.1:8b"  # Ollama model name
+    model_path: null  # Path to .gguf file for llama.cpp
+    context_length: 128000
+    temperature: 0.7
+    top_p: 0.9
+    max_tokens: 2048
+    
+  # Embedding Model Configuration
+  embedding:
+    provider: "bge-m3"  # Options: bge-m3, nomic, ollama
+    model_name: "bge-m3:latest"  # Ollama model name
+    dimensions: 1024  # 768 for nomic, 1024 for bge-m3
+    normalize: true
+    batch_size: 32
+    
+  # Ollama Server (for ollama provider)
+  ollama:
+    host: "${OLLAMA_HOST:-http://localhost:11434}"
+    api_key: null  # Usually not needed for local Ollama
+    
+  # llama.cpp Server (for llama.cpp provider)
+  llama_cpp:
+    host: "${LLAMA_CPP_HOST:-http://localhost:8080}"
+    api_key: null
+
+# Letta Server Integration (Self-Hosted)
+# All agents automatically use Letta for:
+# - Automatic conversation saving
+# - Memory management (core, archival, persona, human)
+# - Cross-agent context sharing
+# - Persistent agent state
+letta:
+  server_url: "${LETTA_SERVER_URL:-http://localhost:8283}"
+  api_key: "${LETTA_API_KEY}"
+  pg_uri: "${LETTA_PG_URI:-postgresql://cbwinslow:123qweasd@localhost:5432/cbw_rag}"
+  auto_save_conversations: true
+  auto_create_memories: true
+  memory_types:
+    - core        # Permanent agent knowledge
+    - archival    # Long-term storage
+    - context     # Session context
+    - persona     # Agent personality
+    - human       # User preferences/info
+  sync_interval_seconds: 60
+  backup_enabled: true
+
+# Shared Skills (All agents have access to these)
+# Skills are loaded from ~/dotfiles/ai/skills/
+skills:
+  - unified_memory       # Combined Letta A0 + CBW RAG (primary memory interface)
+  - a0_memory            # Agent-Zero style autonomous memory (Letta only)
+  - cbw_rag              # CBW RAG system for file search and indexing
+  - letta_client         # Letta SDK for agent memory operations
+  - memory_hooks         # Pre/post task automatic memory hooks
+  - cross_agent_search   # Search memories across all agents
+  - memory_sync          # PostgreSQL to Letta synchronization
+  - bitwarden_secrets    # Secure credential management via Bitwarden
+
+# Shared Tools (All agents have access to these)
+# Tools are loaded from ~/dotfiles/ai/tools/
+tools:
+  - file_system            # File operations
+  - terminal               # Shell commands
+  - search                 # Codebase search (ripgrep)
+  - web_fetch              # Web content fetching
+  - a0_memory.store                      # Store facts to A0 memory
+  - a0_memory.recall                     # Recall/RAG search
+  - a0_memory.before_task                # Pre-task hook (auto context)
+  - a0_memory.after_task                 # Post-task hook (auto store)
+  - a0_memory.rag                        # Pure RAG search
+  - unified_memory.before_task           # Unified pre-task (Letta + RAG)
+  - unified_memory.after_task            # Unified post-task (Letta + RAG)
+  - unified_memory.search_files          # Search indexed files
+  - unified_memory.search_code           # Search code patterns
+  - unified_memory.find_duplicates       # Find duplicate files
+  - unified_memory.store                 # Store fact to unified memory
+  - a0_memory.set_block                  # Update core memory blocks
+  - letta_client.create_agent             # Create Letta agents
+  - letta_client.send_message             # Send messages to agents
+  - letta_client.search_archival         # Vector search archival memory
+  - memory_sync.sync_to_letta            # Sync PostgreSQL to Letta
+  - cross_agent_search.query             # Cross-agent memory search
+  - cli_operations.run_letta_command      # Run Letta CLI commands
+  - cli_operations.search_letta_memories  # Search Letta memories
+  - cli_operations.store_letta_memory     # Store memories in Letta
+  - bitwarden_secrets.unlock_vault           # Unlock Bitwarden vault
+  - bitwarden_secrets.lock_vault             # Lock Bitwarden vault
+  - bitwarden_secrets.get_secret             # Get a secret from Bitwarden
+  - bitwarden_secrets.list_secrets           # List secrets in Bitwarden
+  - bitwarden_secrets.populate_env           # Populate .env file with secrets
+  - bitwarden_secrets.get_login              # Get login credentials
+  - bitwarden_secrets.generate_password      # Generate secure password
+  - bitwarden_secrets.check_status           # Check vault status
+  - cbw_rag.semantic_search                # Semantic search across indexed files
+  - cbw_rag.find_duplicates                # Find duplicate files
+  - cbw_rag.similar_code                   # Find similar code patterns
+  - cbw_rag.index_files                    # Index new directories
+
+# Memory Configuration
+memory:
+  backend: letta_server
+  auto_save: true
+  auto_load: true
+  default_ttl_days: 90
+  max_memory_size_mb: 100
+  cleanup_interval_hours: 24
+
+# Context Management
+context:
+  max_context_length: 8000
+  auto_save_interval: 180  # seconds
+  persistent_context: true
+  share_cross_agents: true
+
+# Processing Settings
+processing:
+  max_concurrent_tasks: 3
+  timeout_seconds: 300
+  retry_attempts: 2
+  batch_size: 5
+
+# Integration Settings
+integrations:
+  letta:
+    enabled: true
+    server_url: "${LETTA_SERVER_URL:-http://localhost:8283}"
+    api_key: "${LETTA_API_KEY}"
+    auto_sync: true
+  agent_memory:
+    enabled: true
+    package_path: /home/cbwinslow/dotfiles/ai/packages/agent_memory
+    database: "letta"
+
+# MCP Servers (for agents that support MCP)
+mcp_servers:
+  bitwarden:
+    command: npx
+    args: ["-y", "@bitwarden/mcp-server"]
+    env:
+      BW_SESSION: "${BW_SESSION}"
+  
+  cbw_rag:
+    command: python3
+    args: ["~/dotfiles/ai/shared/mcp/rag_server.py"]
+    env:
+      CBW_RAG_DATABASE: "${CBW_RAG_DATABASE}"
+      CBW_RAG_OLLAMA_URL: "${CBW_RAG_OLLAMA_URL:-http://localhost:8081}"
+      CBW_RAG_EMBEDDING_MODEL: "${CBW_RAG_EMBEDDING_MODEL:-nomic-embed-text}"
+    
+  letta_server:
+    command: python3
+    args: ["~/dotfiles/ai/packages/letta_integration/letta_server_cli.py"]
+    env:
+      LETTA_SERVER_URL: "${LETTA_SERVER_URL:-http://localhost:8283}"
+      LETTA_API_KEY: "${LETTA_API_KEY}"
+
+# Environment-Specific Overrides
+environments:
+  development:
+    debug: true
+    log_level: DEBUG
+    memory_ttl_days: 7
+  production:
+    debug: false
+    log_level: INFO
+    memory_ttl_days: 180
+
+# Agent Behavior
+behavior:
+  max_iterations: 10
+  allow_self_modification: false
+  require_approval: false
+  auto_save_progress: true
+  search_memory_first: true  # Search Letta before starting tasks
+
+# Security Settings
+security:
+  allow_file_access: true
+  allowed_paths:
+    - /home/cbwinslow/workspace
+    - /home/cbwinslow/dotfiles
+    - /home/cbwinslow/infra
+  blocked_commands:
+    - rm -rf /
+    - sudo
+    - chmod 777
+
+# Global Rules (Mandatory for all agents)
+global_rules:
+  enabled: true
+  rules_file: /home/cbwinslow/dotfiles/ai/global_rules/agent_init_rules.md
+  enforce_memory_first: true
+  enforce_centralized_config: true
+  enforce_cross_agent_collab: true

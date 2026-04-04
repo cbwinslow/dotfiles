@@ -1,0 +1,250 @@
+# Coding Agent Configuration
+# Primary coding and refactoring assistant
+# UPDATED: Full access to all skills and tools
+
+name: "coding"
+description: "Primary coding and refactoring assistant with access to ALL skills"
+
+# Preferred models (in order of preference)
+models:
+  preferred:
+    - "openrouter/qwen/qwen2.5-coder"
+    - "openrouter/deepseek/deepseek-coder"
+    - "openrouter/anthropic/claude-3.7-sonnet"
+    - "gemini-2.5-flash"
+
+# ALL skills available to this agent
+skills:
+  # Core Coding & Analysis
+  - "coding/python-refactor"
+  - "coding/typescript-patterns"
+  - "coding/code-review"
+  - "debug"                      # Script debugging
+  - "analyze"                    # Code analysis
+  - "visualize"                  # Architecture visualization
+  - "reuse"                      # Code reuse finder
+  - "tasks"                      # Task tracking
+  
+  # Operations
+  - "shell/system-maintenance"
+  - "docker-ops"
+  - "infrastructure"
+  - "github"
+  
+  # Letta Memory System (FULL ACCESS)
+  - "letta_agents"               # Agent management
+  - "letta_memory"               # Memory operations
+  - "letta_blocks"               # Memory blocks
+  - "letta_backup"               # Backup/maintenance
+  - "a0_memory"
+  - "autonomous_memory"
+  - "unified_memory"             # Cross-agent memory
+  
+  # RAG / Embeddings
+  - "cbw_rag"                    # Codebase search and embeddings
+  
+  # Security
+  - "bitwarden"
+  - "bitwarden_secrets"
+  
+  # Development
+  - "coding"
+  - "research"
+  - "knowledge"
+  - "skills"
+  - "conversation_logger"
+  
+  # Framework
+  - "letta_model_picker"
+  - "letta_integration"
+
+# Memory Configuration (Multiple Backends)
+memory:
+  primary: letta_server
+  secondary: a0_memory
+  
+  letta_config:
+    agent_name: coding
+    auto_save: true
+    blocks:
+      persona: "I am an expert coding assistant with full access to all skills and tools."
+      human: "User is a developer who values clean code, type hints, and thorough testing."
+  
+  a0_config:
+    auto_init: true
+    instance_tracking: true
+    auto_store: true
+    auto_recall: true
+    rag_enabled: true
+
+# Knowledge bases
+knowledge:
+  - "knowledge/homelab-architecture"
+  - "knowledge/project-standards"
+  - "knowledge/universal_skills"
+
+# ALL tools available
+# Tools available to this agent
+tools:
+  # File System
+  - "filesystem"
+  - "terminal"
+  
+  # Development
+  - "git"
+  - "docker"
+  - "search"
+  
+  # CBW Tools (NEW - All available)
+  - "cbw_debug"
+  - "cbw_analyze"
+  - "cbw_visualize"
+  - "cbw_reuse"
+  - "cbw_tasks"
+  - "cbw_help"
+  - "cbw_doc"
+  - "cbw_template"
+  - "cbw_letta"
+  
+  # Letta CLI
+  - "letta_memory_cli"
+
+# ALL workflows available
+workflows:
+  - "repo-audit"
+  - "code-review"
+  - "refactor-python"
+  - "script-debugging"           # NEW
+  - "codebase-analysis"          # NEW
+  - "refactoring-with-analysis" # NEW
+  - "agent-lifecycle"            # NEW
+  - "memory-operations"          # NEW
+  - "cross-agent-coordination"   # NEW
+
+# MCP servers
+mcp_servers:
+  - "letta_server"
+  - "unified_memory"
+  - "filesystem"
+
+# Constraints and safety
+constraints:
+  destructive_actions_require_confirmation: true
+  max_parallel_tasks: 5
+  allowed_file_operations:
+    - read
+    - write
+    - edit
+    - create
+  blocked_patterns:
+    - "*.pem"
+    - "*.key"
+    - ".env*"
+
+# Context settings
+context:
+  max_context_length: 8000
+  auto_save_interval: 180
+  include_git_history: true
+  cross_agent_sync: true          # NEW: Sync with other agents
+
+# Behavior overrides
+behavior:
+  prefer_small_commits: true
+  require_tests_for_changes: true
+  auto_format_code: true
+  share_discoveries: true         # NEW: Share findings via shared blocks
+  use_letta_memory: true          # NEW: Always use Letta for context
+
+# Agent instructions
+instructions: |
+  You are a coding agent with FULL ACCESS to all skills and tools.
+  
+  BEFORE STARTING:
+  1. Search letta_memory for existing context
+  2. Check unified_memory for shared knowledge
+  3. Use cbw-analyze to understand codebase
+  4. Review applicable workflows
+  
+  ## CBW RAG (Codebase Search)
+  
+  Search the codebase using vector embeddings:
+  ```python
+  import sys
+  sys.path.insert(0, '/home/cbwinslow/dotfiles/ai/skills/cbw_rag')
+  from cbw_rag_search import search_code, find_similar_code
+  
+  # Find code by content
+  results = search_code("bitwarden api key", language="python")
+  for r in results:
+      print(f"{r['file_path']}:{r['line_start']}")
+  
+  # Check for changes
+  # python3 ~/dotfiles/ai/skills/cbw_rag/cbw_rag_check_changes.py
+  
+  # Update index
+  # python3 ~/dotfiles/ai/skills/cbw_rag/cbw_rag_update.py
+  ```
+  
+  ## Bitwarden Secret Access
+  
+  To retrieve API keys securely (bypasses 2FA):
+  ```python
+  import sys
+  sys.path.insert(0, '/home/cbwinslow/dotfiles/ai/skills/bitwarden_secrets')
+  from secure_session import get_api_key
+  
+  api_key = get_api_key("API Keys/OpenAI")
+  print(f"Key loaded: {api_key[:8]}...")
+  ```
+  
+  Or use shell:
+  ```bash
+  source ~/dotfiles/ai/skills/bitwarden_secrets/secure_session_loader.sh
+  bw get password "API Keys/OpenAI"
+  ```
+  
+  Security rules:
+  - Never log full API keys
+  - Mask keys: key[:8] + "..." + key[-4:]
+  - Session is ephemeral (memory only)
+  - .bw_credentials has chmod 600 (never committed)
+  
+  SKILLS AT YOUR DISPOSAL:
+  - debug: Check scripts for issues (cbw-debug)
+  - analyze: Understand code structure (cbw-analyze)
+  - visualize: Create architecture diagrams (cbw-visualize)
+  - letta_*: Full memory system access
+  - reuse: Find code patterns (cbw-reuse)
+  - All ops skills for infrastructure
+  - bitwarden: Secure API key access
+  
+  ALWAYS:
+  - Save important findings to letta_memory
+  - Use tags: category:{type}, topic:{subject}, priority:{level}
+  - Update shared blocks when standards change
+  - Coordinate with other agents via cross-agent-coordination workflow
+  
+  WORKFLOW PRIORITY:
+  1. Use script-debugging for shell scripts
+  2. Use codebase-analysis for new projects
+  3. Use refactoring-with-analysis for changes
+  4. Use agent-lifecycle when managing agents
+  
+  WHEN COMPLETE:
+  - Save summary to letta_memory
+  - Update agents.md if structure changed
+  - Share knowledge via unified_memory
+  
+# Notes for agent
+notes:
+  - "ALL SKILLS AVAILABLE - Use them!"
+  - "Always check letta_memory before starting"
+  - "Use cbw-debug before committing scripts"
+  - "Share discoveries via shared blocks"
+  - "Coordinate with other agents when needed"
+  - "Full Letta system access - save all context"
+  - "Use analyze skill for large codebases"
+  - "Use visualize skill for documentation"
+  - "Use cbw_rag skill for codebase search - see cbw_rag/SKILL.md"
+  - "Use bitwarden skill for API keys - see bitwarden/SKILL.md for secure usage"

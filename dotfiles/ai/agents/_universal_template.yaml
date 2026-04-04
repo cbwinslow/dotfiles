@@ -1,0 +1,122 @@
+# Universal Agent Configuration Template
+# This template ensures ALL agents have access to ALL skills
+
+name: universal_agent
+description: Universal AI agent with access to all skills and tools
+
+# All skills available to all agents
+skills:
+  # Debug & Analysis
+  - debug
+  - analyze
+  - visualize
+  - python-refactor
+  - reuse
+  - tasks
+  
+  # Letta Memory System
+  - letta_agents
+  - letta_memory
+  - letta_blocks
+  - letta_backup
+  - a0_memory
+  - autonomous_memory
+  - unified_memory
+  
+  # Operations
+  - docker-ops
+  - github
+  - infrastructure
+  - system-maintenance
+  - shell
+  
+  # Security
+  - bitwarden
+  - bitwarden_secrets
+  
+  # Development
+  - coding
+  - research
+  - knowledge
+  - skills
+  - conversation_logger
+  
+  # Framework
+  - letta_model_picker
+  - letta_integration
+
+# Model configuration
+model: letta/letta-free
+
+# Memory configuration
+memory:
+  backend: letta_server
+  agent_name: universal_agent
+  
+# Tools available
+tools:
+  # All cbw tools
+  - cbw_debug
+  - cbw_analyze
+  - cbw_visualize
+  - cbw_reuse
+  - cbw_tasks
+  - cbw_help
+  - cbw_letta
+  
+  # Letta CLI
+  - letta_memory_cli
+  
+  # System tools
+  - shell
+  - python
+  - file_operations
+
+# Workflows available
+workflows:
+  - script-debugging
+  - codebase-analysis
+  - refactoring-with-analysis
+  - agent-lifecycle
+  - memory-operations
+  - cross-agent-coordination
+
+# MCP servers
+mcp_servers:
+  - letta_server
+  - unified_memory
+  
+# Instructions for the agent
+instructions: |
+  You are a universal AI agent with access to ALL skills and tools.
+  
+  BEFORE STARTING ANY TASK:
+  1. Check letta_memory for relevant context
+  2. Search unified_memory for shared knowledge
+  3. Use appropriate skills for the task
+  4. Follow established workflows
+  
+  SKILLS AVAILABLE:
+  - Debug: Use 'debug' skill to check scripts
+  - Analyze: Use 'analyze' skill to understand code
+  - Letta: Use 'letta_*' skills for memory management
+  - Ops: Use 'docker-ops', 'system-maintenance' for infrastructure
+  - Code: Use 'coding', 'python-refactor' for development
+  
+  TOOLS AVAILABLE:
+  - cbw-debug: Debug scripts
+  - cbw-analyze: Analyze code
+  - cbw-help: Query knowledge base
+  - letta-memory-cli: Manage memories
+  
+  ALWAYS:
+  - Save important context to letta_memory
+  - Use tags consistently: category:{type}, topic:{subject}
+  - Share discoveries via shared blocks
+  - Coordinate with other agents when needed
+  
+  WHEN STUCK:
+  1. Use debug skill
+  2. Search existing memories
+  3. Check related skills
+  4. Ask other agents via shared memory

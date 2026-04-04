@@ -1,0 +1,86 @@
+# AI Provider Configurations
+# Centralized provider settings for all agents
+# Location: ~/dotfiles/ai/base/providers.yaml
+
+# Default Provider (OpenRouter Free Models)
+default:
+  provider: openrouter
+  model: openrouter/free
+  api_key_env: OPENROUTER_API_KEY
+  base_url: https://openrouter.ai/api/v1
+  description: "OpenRouter free model router - automatically routes to available free models"
+
+# OpenRouter Configuration
+openrouter:
+  base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  
+  # Free Models Available
+  free_models:
+    - id: openrouter/free
+      description: "Auto-router to available free models"
+      recommended: true
+    
+    - id: meta-llama/llama-3-8b-instruct:free
+      description: "Meta Llama 3 8B Instruct (free tier)"
+      capabilities: [chat, code, reasoning]
+    
+    - id: google/gemma-7b-it:free
+      description: "Google Gemma 7B Instruct (free tier)"
+      capabilities: [chat, writing, code]
+    
+    - id: mistralai/mistral-7b-instruct:free
+      description: "Mistral 7B Instruct (free tier)"
+      capabilities: [chat, code, reasoning]
+    
+    - id: microsoft/phi-3-mini-128k-instruct:free
+      description: "Microsoft Phi-3 Mini (free tier)"
+      capabilities: [chat, code, reasoning]
+    
+    - id: qwen/qwen-2-7b-instruct:free
+      description: "Alibaba Qwen 2 7B Instruct (free tier)"
+      capabilities: [chat, code, multilingual]
+
+  # Settings for free models
+  settings:
+    max_tokens: 4096
+    temperature: 0.7
+    top_p: 0.9
+    presence_penalty: 0
+    frequency_penalty: 0
+
+# Alternative Providers (for reference)
+anthropic:
+  base_url: https://api.anthropic.com/v1
+  api_key_env: ANTHROPIC_API_KEY
+  models:
+    - claude-sonnet-4-5
+    - claude-opus-4-0
+    - claude-3-5-sonnet-20241022
+  note: "Paid provider - use only when free models insufficient"
+
+google:
+  base_url: https://generativelanguage.googleapis.com/v1beta
+  api_key_env: GOOGLE_AI_API_KEY
+  models:
+    - gemini-2.0-flash-exp:free
+    - gemini-pro
+  note: "Some free tier available"
+
+openai:
+  base_url: https://api.openai.com/v1
+  api_key_env: OPENAI_API_KEY
+  models:
+    - gpt-4o-mini
+    - gpt-3.5-turbo
+  note: "Paid provider - use only when free models insufficient"
+
+# Local Models (Self-Hosted)
+local:
+  base_url: http://localhost:11434/v1
+  api_key_env: OLLAMA_API_KEY
+  models:
+    - llama3.2
+    - mistral
+    - qwen2.5
+  note: "Requires Ollama or similar local model runner"

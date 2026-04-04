@@ -1,0 +1,119 @@
+# Memory Configuration
+# Centralized Letta memory settings for all agents
+# Location: ~/dotfiles/ai/base/memory.yaml
+
+# Letta Server Configuration
+letta_server:
+  # Connection Settings
+  server_url: "${LETTA_SERVER_URL:-http://localhost:8283}"
+  api_key: "${LETTA_API_KEY}"
+  
+  # Agent Configuration
+  agent_prefix: "agent_"
+  auto_create_agents: true
+  
+  # Memory Types (Letta supports these)
+  memory_types:
+    core:
+      description: "Permanent knowledge that persists across all sessions"
+      ttl_days: -1  # Never expires
+      max_entries: 100
+      auto_save: true
+      
+    archival:
+      description: "Long-term storage for conversations and important context"
+      ttl_days: 365
+      max_entries: 1000
+      auto_save: true
+      
+    context:
+      description: "Session-specific context and working memory"
+      ttl_days: 30
+      max_entries: 500
+      auto_save: true
+      
+    persona:
+      description: "Agent personality and behavior settings"
+      ttl_days: -1  # Never expires
+      max_entries: 50
+      auto_save: true
+      
+    human:
+      description: "User information and preferences"
+      ttl_days: -1  # Never expires
+      max_entries: 100
+      auto_save: true
+
+  # Automatic Memory Operations
+  auto_operations:
+    save_conversation: true
+    create_memories: true
+    extract_entities: true
+    sync_context: true
+    cleanup_old: true
+    
+  # Memory Creation Rules
+  memory_creation:
+    # Automatically create memories from:
+    auto_create_from:
+      - user_requests      # User asks for something
+      - agent_decisions    # Agent makes a decision
+      - important_facts    # Important information discovered
+      - code_changes       # Code written or modified
+      - action_items       # Tasks identified
+      
+    # Memory tagging
+    auto_tag: true
+    tag_sources:
+      - agent_name
+      - date
+      - conversation_topic
+      - entities_mentioned
+
+  # Search Configuration
+  search:
+    default_limit: 10
+    max_limit: 100
+    include_archival: true
+    include_core: true
+    include_context: true
+    min_relevance_score: 0.5
+    
+  # Cleanup Configuration
+  cleanup:
+    enabled: true
+    interval_hours: 24
+    delete_expired: true
+    archive_old: true
+    archive_after_days: 90
+
+# Agent Memory Integration (PostgreSQL backup)
+agent_memory:
+  enabled: true
+  database:
+    host: "${PG_HOST:-localhost}"
+    port: "${PG_PORT:-5432}"
+    database: "${PG_DATABASE:-letta}"
+    user: "${PG_USER:-cbwinslow}"
+    password: "${PG_PASSWORD}"
+    sslmode: prefer
+    
+  # Backup Settings
+  backup:
+    enabled: true
+    interval_minutes: 60
+    retention_days: 90
+    
+  # Sync Settings
+  sync:
+    enabled: true
+    direction: bidirectional
+    conflict_resolution: latest_wins
+
+# Memory Statistics and Monitoring
+monitoring:
+  enabled: true
+  log_stats: true
+  stats_interval_minutes: 60
+  alert_on_low_space: true
+  low_space_threshold_mb: 100

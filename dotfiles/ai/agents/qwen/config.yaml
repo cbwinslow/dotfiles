@@ -1,0 +1,57 @@
+# Qwen Agent Configuration
+# Location: ~/dotfiles/ai/agents/qwen/config.yaml
+# Inherits from: ~/dotfiles/ai/base/base_agent.yaml
+
+# ★ Shared Resources - Centralized for all agents ★
+shared_resources:
+  skills_path: ~/dotfiles/ai/shared/skills
+  tools_path: ~/dotfiles/ai/shared/tools
+  scripts_path: ~/dotfiles/ai/shared/scripts
+  mcp_servers_path: ~/dotfiles/ai/shared/mcp
+  docs_path: ~/dotfiles/ai/shared/docs
+
+# Agent-specific settings (overrides base config)
+extends: ../../base/base_agent.yaml
+
+name: qwen_agent
+framework: langchain
+
+# Qwen-specific tools
+tools:
+  - file_system
+  - terminal
+  - search
+  - web_fetch
+  - cbw_rag.semantic_search
+  - cbw_rag.find_duplicates
+  - cbw_rag.similar_code
+  - cbw_rag.index_files
+  - letta_server.store_conversation
+  - letta_server.search_memories
+  - letta_server.get_memory_stats
+
+# Qwen-specific skills
+skills:
+  - code_generation
+  - analysis
+  - multilingual
+  - cbw_rag_query
+  - cbw_find_duplicates
+  - cbw_similar_code
+
+# Qwen supports multilingual tasks
+multilingual:
+  enabled: true
+  languages:
+    - en
+    - zh
+    - es
+    - fr
+    - de
+    - ja
+
+# Security settings specific to Qwen
+security:
+  allowed_paths:
+    - /home/cbwinslow/workspace
+    - /home/cbwinslow/dotfiles

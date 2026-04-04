@@ -1,0 +1,45 @@
+{
+  "system_version": "1.0.0",
+  "installation_date": "2026-03-24",
+  "base_path": "/home/cbwinslow/dotfiles/ai",
+  "components": {
+    "agent_memory_package": true,
+    "global_rules": true,
+    "agent_configs": true,
+    "framework_integrations": true,
+    "github_backup": true,
+    "auto_initialization": true,
+    "shell_integration": true
+  },
+  "agents": [
+    "opencode",
+    "gemini",
+    "claude",
+    "cline",
+    "kilocode",
+    "vscode",
+    "windsurf",
+    "openclaw"
+  ],
+  "frameworks": [
+    "langchain",
+    "crewai",
+    "autogen"
+  ],
+  "skills": [
+    "memory_management",
+    "cross_agent_communication"
+  ],
+  "tools": [
+    "file_system",
+    "terminal",
+    "search",
+    "memory_operations"
+  ],
+  "environment": {
+    "postgres_host": "localhost",
+    "postgres_port": "5432",
+    "postgres_db": "letta",
+    "letta_server": "http://localhost:8283"
+  }
+}
