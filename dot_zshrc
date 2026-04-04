@@ -3,12 +3,18 @@
 
 setopt autocd              # change directory just by typing its name
 #setopt correct            # auto correct mistakes
+export TERM=xterm-256color
 setopt interactivecomments # allow comments in interactive mode
 setopt magicequalsubst     # enable filename expansion for arguments of the form ‘anything=expression’
 setopt nonomatch           # hide error message if there is no match for the pattern
 setopt notify              # report the status of background jobs immediately
 setopt numericglobsort     # sort filenames numerically when it makes sense
 setopt promptsubst         # enable command substitution in prompt
+
+# Source Prezto.
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
 
 WORDCHARS='_-' # Don't consider certain characters part of the word
 
@@ -281,59 +287,55 @@ if [ -f ~/.zsh_secrets ]; then
     . ~/.zsh_secrets
 fi
 
+# NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Build PATH with proper precedence (highest priority first)
-# Start with custom tools
-export PATH="$HOME/.opencode/bin:$HOME/.qlty/bin:$HOME/.dotbins/linux/amd64/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.qlty/bin:$HOME/.dotbins/linux/amd64/bin:$HOME/.npm-global/bin:$PATH"
 
-# Add Homebrew paths to ensure tools like qwen use latest versions
+# Homebrew
 if command -v brew >/dev/null 2>&1; then
   eval "$(brew shellenv)"
 elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-# Add NPM global after Homebrew to maintain proper precedence
-export PATH="$PATH:$HOME/.npm-global/bin"
+# . "$HOME/.atuin/bin/env"
 
-# Add node@24 path (if needed)
-export PATH="$PATH:/home/linuxbrew/.linuxbrew/opt/node@24/bin"
-
-# Final PATH adjustment to ensure Homebrew paths have precedence for tools like qwen
-if command -v brew >/dev/null 2>&1; then
-  export PATH="$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH"
-elif [ -d "/home/linuxbrew/.linuxbrew" ]; then
-  export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
-fi
-
-. "$HOME/.atuin/bin/env"
-
-eval "$(atuin init zsh)"
+# eval "$(atuin init zsh)"
 
 # OpenClaw Completion
-source "/home/cbwinslow/.openclaw/completions/openclaw.zsh"
+# source "/home/cbwinslow/.openclaw/completions/openclaw.zsh"
 
 
-# Bitwarden AI Agent Skill
-# Main command: ~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh
+# Bitwarden CLI
 alias bw='/usr/local/bin/bw'
-alias bw-unlock='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh unlock'
-alias bw-lock='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh lock'
-alias bw-get='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh get'
-alias bw-list='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh list'
-alias bw-search='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh search'
-alias bw-env='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh env'
-alias bw-status='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh status'
-alias bw-interactive='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh interactive'
-alias bw-setup='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh setup'
 
-# Quick access to session (for AI agents)
-alias bw-session='source ~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh session'
+# Bitwarden helper scripts
+if [ -f "$HOME/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh" ]; then
+    alias bw-unlock='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh unlock'
+    alias bw-lock='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh lock'
+    alias bw-get='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh get'
+    alias bw-list='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh list'
+    alias bw-search='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh search'
+    alias bw-env='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh env'
+    alias bw-status='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh status'
+    alias bw-interactive='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh interactive'
+    alias bw-setup='~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh setup'
+    alias bw-session='source ~/dotfiles/ai/shared/skills/bitwarden/bitwarden.sh session'
+fi
 
 # Bitwarden CLI integration
-if [ -f "{{ .chezmoi.homeDir }}/.config/bitwarden/bw-helper.sh" ]; then
-    source "{{ .chezmoi.homeDir }}/.config/bitwarden/bw-helper.sh"
+if [ -f "$HOME/.config/bitwarden/bw-helper.sh" ]; then
+    source "$HOME/.config/bitwarden/bw-helper.sh"
 fi
+
+# Go
+export GOPATH="$HOME/go"
+export PATH="$GOPATH/bin:$PATH"
+
+# Source local customizations
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+

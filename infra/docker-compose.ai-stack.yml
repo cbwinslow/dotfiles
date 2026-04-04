@@ -1,0 +1,143 @@
+# Master Docker Compose - All AI Services
+# Usage: docker compose -f docker-compose.ai-stack.yml up -d
+
+services:
+  # Letta Memory Server
+  letta:
+    image: letta/letta:latest
+    container_name: letta-server
+    restart: unless-stopped
+    ports:
+      - "8283:8283"
+    environment:
+      - LETTA_SERVER_PORT=8283
+      - LETTA_PG_HOST=postgres
+      - LETTA_PG_PORT=5432
+      - LETTA_PG_USER=${POSTGRES_USER:-cbwinslow}
+      - LETTA_PG_PASSWORD=${POSTGRES_PASSWORD:-123qweasd}
+      - LETTA_PG_DATABASE=letta
+      - LETTA_PG_VECTOR_DIM=768
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    volumes:
+      - letta-data:/root/.letta
+    depends_on:
+      - postgres
+    networks:
+      - ai-network
+
+  # OpenClaw Gateway
+  openclaw:
+    build:
+      context: ./openclaw
+      dockerfile: Dockerfile
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENCLAW_PORT=3000
+    volumes:
+      - openclaw-data:/app/openclaw-data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ai-network
+
+  # n8n Workflow Automation
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-n8n-secret-key}
+      - GENERIC_TIMEZONE=America/New_York
+    volumes:
+      - n8n-data:/home/node/.n8n
+    networks:
+      - ai-network
+
+  # Local AI Models (Ollama + ComfyUI)
+  local-ai:
+    image: ollama/ollama:latest
+    container_name: local-ai
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+      - /home/cbwinslow/workspace/epstein-data/models:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - ai-network
+
+  # PostgreSQL (shared database)
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: postgres-ai
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-cbwinslow}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-123qweasd}
+      - POSTGRES_DB=epstein
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ai-network
+
+  # Redis (cache for AI services)
+  redis:
+    image: redis:7-alpine
+    container_name: redis-ai
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - ai-network
+
+  # RAG Server (custom)
+  rag-server:
+    build:
+      context: ../epstein/Epstein-Pipeline
+      dockerfile: Dockerfile
+    container_name: rag-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-cbwinslow}:${POSTGRES_PASSWORD:-123qweasd}@postgres:5432/epstein
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    volumes:
+      - ../epstein-data/processed:/data/processed
+      - ../epstein-data/databases:/data/databases
+    depends_on:
+      - postgres
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    driver: bridge
+
+volumes:
+  letta-data:
+  openclaw-data:
+  n8n-data:
+  ollama-data:
+  postgres-data:
+  redis-data:

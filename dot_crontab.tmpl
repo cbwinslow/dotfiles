@@ -1,0 +1,20 @@
+# Crontab - Managed by chezmoi
+# Edit source, not this file
+
+# Kuma uptime monitoring
+* * * * * /usr/local/bin/kuma-push-metrics.sh > /dev/null 2>&1
+
+# Epstein Exposed email downloader - every hour
+0 * * * * cd {{ .chezmoi.sourceDir | dir }}/epstein && {{ .chezmoi.sourceDir | dir }}/epstein/.venv/bin/python -u scripts/epstein_exposed_emails.py >> logs/ee_emails_cron.log 2>&1
+
+# FEC donation downloader - every hour at :30
+30 * * * * cd {{ .chezmoi.sourceDir | dir }}/epstein && {{ .chezmoi.sourceDir | dir }}/epstein/.venv/bin/python -u scripts/fec_downloader.py >> logs/fec_cron.log 2>&1
+
+# GitHub API scanner - daily at 3am
+0 3 * * * /bin/bash {{ .chezmoi.sourceDir | dir }}/github_api_scanner/scan.sh >> {{ .chezmoi.sourceDir | dir }}/github_api_scanner/logs/cron.log 2>&1
+
+# Letta memory backup - daily at 2am
+0 2 * * * PGPASSWORD={{ .postgres_password | default "123qweasd" }} pg_dump -U {{ .chezmoi.username }} -h localhost epstein --format=custom --compress=9 --file="/home/{{ .chezmoi.username }}/workspace/epstein-data/backups/epstein_$(date +\%Y\%m\%d_\%H\%M\%S).dump" 2>> /home/{{ .chezmoi.username }}/workspace/epstein-data/logs/backup.log
+
+# System updates check - weekly on Sunday at 4am
+0 4 * * 0 /usr/bin/apt update && /usr/bin/apt list --upgradable >> /home/{{ .chezmoi.username }}/workspace/epstein-data/logs/updates.log 2>&1

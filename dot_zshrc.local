@@ -1,0 +1,25 @@
+export HOME=/home/cbwinslow
+export PATH="$HOME/.local/bin:$HOME/.nvm/versions/node/v24.14.0/bin:$HOME/.bun/bin:$PATH"
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && . /usr/share/doc/fzf/examples/key-bindings.zsh
+[ -f /usr/share/doc/fzf/examples/completion.zsh ] && . /usr/share/doc/fzf/examples/completion.zsh
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+alias ls='eza --icons'
+alias ll='eza -la --icons --git'
+alias lt='eza -T --icons --level=2'
+alias cat='batcat --paging=never'
+alias fd='fdfind'
+alias grep='rg'
+alias gs='git status'
+alias gd='git diff'
+alias gl='git log --oneline --graph -20'
+export GOPATH="$HOME/go"
+export PATH="$GOPATH/bin:$PATH"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# AI Agents
+alias opencode='/home/cbwinslow/.nvm/versions/node/v24.14.0/bin/opencode'
+alias cline='/home/cbwinslow/.nvm/versions/node/v24.14.0/bin/cline'
+alias qwen='/home/cbwinslow/.nvm/versions/node/v24.14.0/bin/qwen'
+alias kilocode='/home/cbwinslow/.nvm/versions/node/v24.14.0/bin/kilocode'
+alias gemini='/home/cbwinslow/.nvm/versions/node/v24.14.0/bin/gemini'
