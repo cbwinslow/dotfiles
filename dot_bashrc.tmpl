@@ -303,8 +303,6 @@ if [[ "$0" == *"cline"* ]]; then load_ai_skills "cline"; fi
 if [[ "$0" == *"codex"* ]]; then load_ai_skills "codex"; fi
 if [[ "$0" == *"windsurf"* ]]; then load_ai_skills "windsurf"; fi
 if [[ "$0" == *"openclaw"* ]]; then load_ai_skills "openclaw"; fi
-{{- $hf_token := promptStringOnce . "hf_token" "HuggingFace token (hf_...)" -}}
-export HF_TOKEN={{ $hf_token | quote }}
 
 # Bitwarden CLI integration
 if [ -f "{{ .chezmoi.homeDir }}/.config/bitwarden/bw-helper.sh" ]; then
