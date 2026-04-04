@@ -1,0 +1,112 @@
+---
+name: Security Scan
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 6 * * *'  # daily at 6 AM
+
+jobs:
+  trufflehog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha || github.event.before }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  check-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan for high entropy strings
+        run: |
+          pip install gitleaks
+          gitleaks detect --source . --report-path gitleaks-report.json --redact || true
+          
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan-results
+          path: gitleaks-report.json
+
+  yaml-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate all YAML files
+        run: |
+          find . -name "*.yaml" -o -name "*.yml" | while read f; do
+            echo "Checking $f"
+            python3 -c "import yaml; yaml.safe_load(open('$f'))" || exit 1
+          done
+          echo "✅ All YAML files valid"
+
+  agent-config-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate agent configs against schema
+        run: |
+          python3 - <<'PYEOF'
+          import yaml, json, sys
+          from pathlib import Path
+          
+          agents_dir = Path("dotfiles/ai/agents")
+          schema = {
+              "required": ["name", "framework", "tools", "skills"],
+              "types": {
+                  "name": str,
+                  "framework": str,
+                  "tools": list,
+                  "skills": list,
+                  "description": str,
+                  "model": str,
+              }
+          }
+          
+          errors = []
+          for agent_dir in agents_dir.iterdir():
+              if agent_dir.is_dir() and not agent_dir.name.startswith('_'):
+                  cfg_path = agent_dir / "config.yaml"
+                  if cfg_path.exists():
+                      try:
+                          with open(cfg_path) as f:
+                              config = yaml.safe_load(f)
+                          
+                          for req in schema["required"]:
+                              if req not in config:
+                                  errors.append(f"{agent_dir.name}: missing required '{req}'")
+                          
+                          for key, expected_type in schema["types"].items():
+                              if key in config and not isinstance(config[key], expected_type):
+                                  errors.append(f"{agent_dir.name}: {key} should be {expected_type.__name__}")
+                          
+                      except yaml.YAMLError as e:
+                          errors.append(f"{agent_dir.name}: YAML error - {e}")
+          
+          if errors:
+              print("Agent config validation failed:")
+              for e in errors:
+                  print(f"  ✗ {e}")
+              sys.exit(1)
+          else:
+              print(f"✅ All agent configs valid")
+          PYEOF

@@ -1,0 +1,30 @@
+# Code Owners
+# This file defines who owns which parts of the codebase.
+# Code owners are automatically requested for review when changes are made.
+
+* @cbwinslow
+
+# Core AI infrastructure
+/.github/ @cbwinslow
+/dotfiles/ai/ @cbwinslow
+/infra/ @cbwinslow
+
+# Zsh configuration
+/.zshrc @cbwinslow
+/.zpreztorc @cbwinslow
+/dot_zshrc @cbwinslow
+
+# Agent configurations
+/dotfiles/ai/agents/ @cbwinslow
+/dotfiles/ai/base/ @cbwinslow
+/dotfiles/ai/global_rules/ @cbwinslow
+
+# Skills
+/dotfiles/ai/shared/skills/ @cbwinslow
+/dotfiles/ai/skills/ @cbwinslow
+
+# Scripts
+/dotfiles/ai/scripts/ @cbwinslow
+
+# Services
+/dotfiles/ai/services/ @cbwinslow

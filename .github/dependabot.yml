@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: ".github/workflows"
+    schedule:
+      interval: "weekly"
+    open-pull-requests: 1
+    assignees:
+      - "cbwinslow"
+  - package-ecosystem: "npm"
+    directory: "dotfiles/ai"
+    schedule:
+      interval: "weekly"
+    open-pull-requests: 1
+  - package-ecosystem: "pip"
+    directory: "dotfiles/ai"
+    schedule:
+      interval: "weekly"
+    open-pull-requests: 1

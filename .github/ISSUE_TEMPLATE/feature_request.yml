@@ -1,0 +1,91 @@
+---
+name: Feature Request
+description: Suggest a new feature or enhancement for the AI agent ecosystem
+title: "[Feature] "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - "cbwinslow"
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please provide as much detail as possible.
+        
+  - type: input
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A clear, concise description of the feature
+      placeholder: "Add support for..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Use Case
+      description: What problem does this solve? What's the use case?
+      placeholder: "I'm always frustrated when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like
+      placeholder: "We should add..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions you've considered?
+      placeholder: "I also considered..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: agents
+    attributes:
+      label: Affected Agents
+      description: Which AI agents does this affect?
+      options:
+        - label: OpenCode
+        - label: Claude Code
+        - label: Cline
+        - label: KiloCode
+        - label: Codex
+        - label: Gemini
+        - label: Qwen
+        - label: OpenClaw
+        - label: Skills
+        - label: Workflows
+        - label: Infrastructure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+      default: 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or references
+      placeholder: "See also..."
+    validations:
+      required: false

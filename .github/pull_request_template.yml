@@ -1,0 +1,88 @@
+---
+name: Pull Request Template
+description: Template for contributing to the AI agent dotfiles
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing! Please follow these guidelines:
+        
+        ### Before Submitting
+        - [ ] I have read the [CONTRIBUTING.md](CONTRIBUTING.md) guide
+        - [ ] I have tested my changes locally with `chezmoi apply --dry-run`
+        - [ ] I have run validation: `chezmoi diff && chezmoi verify`
+        - [ ] I have not introduced any secrets or credentials
+        - [ ] I have updated documentation if needed
+        
+        ### Changes
+        Describe what changes this PR introduces and why.
+        
+  - type: textarea
+    id: changes
+    attributes:
+      label: Changes
+      description: What does this PR do?
+      placeholder: |
+        - Add new skill for X
+        - Improve Y configuration
+        - Fix Z bug
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why are these changes needed?
+      placeholder: "This fixes..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing
+      description: How were these changes tested?
+      placeholder: |
+        - Ran `chezmoi apply` on test machine
+        - Verified agent Y loaded new skill
+        - Ran CI validation suite
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Contributor Checklist
+      description: Please verify all items
+      options:
+        - label: I have added tests that prove my fix/feature works
+        - label: I have updated the CHANGELOG.md
+        - label: I have bumped version in VERSION file (if applicable)
+        - label: I have documented changes in README or agent docs
+        - label: My changes generate no new warnings
+        - label: I have run `chezmoi diff` to verify changes
+        - label: I have confirmed no secrets are committed
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact Level
+      description: How does this affect the system?
+      options:
+        - Breaking change (requires manual intervention)
+        - Major feature (new agent/skill)
+        - Minor enhancement
+        - Bug fix
+        - Documentation only
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Screenshots, links, references, etc.
+    validations:
+      required: false

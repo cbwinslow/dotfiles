@@ -1,0 +1,110 @@
+name: Release Management
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # fetch all history for changelog
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install yaml
+        run: pip install pyyaml gitpython
+
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          python3 - <<'PYEOF'
+          import re
+          from pathlib import Path
+          from datetime import datetime
+          
+          # Read VERSION from tag
+          tag = "${{
+            github.ref_name
+          }}"
+          
+          # Read CHANGELOG.md
+          changelog = Path("dotfiles/ai/CHANGELOG.md").read_text()
+          
+          # Find section for this version
+          pattern = rf"## \[{re.escape(tag.lstrip('v'))}\].*?(?=## \[|$)"
+          match = re.search(pattern, changelog, re.DOTALL)
+          
+          if match:
+              body = match.group(0).strip()
+          else:
+              body = f"Release {tag}"
+          
+          # Extract version parts
+          parts = tag.lstrip('v').split('.')
+          major, minor, patch = parts[0], parts[1], parts[2] if len(parts) > 2 else "0"
+          
+          # Write output for GitHub release
+          print(f"::set-output name=title::{tag}")
+          print(f"::set-output name=body::{body}")
+          print(f"::set-output name=major::{major}")
+          print(f"::set-output name=minor::{minor}")
+          print(f"::set-output name=patch::{patch}")
+          PYEOF
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ steps.release-notes.outputs.title }}
+          body: ${{ steps.release-notes.outputs.body }}
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+
+      - name: Update VERSION file
+        run: |
+          VERSION="${{ github.ref_name }}"
+          echo "VERSION=${VERSION}" > dotfiles/ai/VERSION
+          echo "COMMIT_SHA=${{
+            github.sha
+          }}" >> dotfiles/ai/VERSION
+          echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> dotfiles/ai/VERSION
+          cat dotfiles/ai/VERSION
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dotfiles/ai/VERSION
+          git commit -m "chore: bump version to ${{ github.ref_name }} [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref_name }}
+
+      - name: Update README with version badge
+        run: |
+          echo "![Version](https://img.shields.io/badge/version-${{ github.ref_name }}-blue.svg)" >> dotfiles/ai/VERSION_BADGE.md
+          
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "🚀 Release ${{ github.ref_name }} published!"
+          echo "📦 Agents ready for deployment"
+          echo "🔗 https://github.com/${
+            github.repository
+          }/releases/tag/${{ github.ref_name }}"

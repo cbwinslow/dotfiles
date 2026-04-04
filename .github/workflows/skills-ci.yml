@@ -2,16 +2,13 @@ name: Skill Test & Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
     paths:
-      - "dotfiles-ai/agents/**"
-      - "dotfiles-ai/shared/skills/**"
-      - "dotfiles-ai/skills/**"
-      - "dotfiles-ai/scripts/**"
-      - "dotfiles-ai/tools/**"
-      - "private_dot_config/private_kilocode/**"
-      - "private_dot_config/private_opencode/**"
-      - "private_dot_config/private_codeium/private_windsurf/**"
+      - "dotfiles/ai/agents/**"
+      - "dotfiles/ai/shared/skills/**"
+      - "dotfiles/ai/skills/**"
+      - "dotfiles/ai/scripts/**"
+      - "dotfiles/ai/tools/**"
       - ".github/workflows/skills-ci.yml"
   workflow_dispatch:
     inputs:
@@ -36,7 +33,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOTFILES_AI: dotfiles-ai
+  DOTFILES_AI: dotfiles/ai
   PYTHON_VERSION: "3.11"
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -80,7 +77,7 @@ jobs:
           from pathlib import Path
 
           agents = ["kilocode","opencode","cline","openclaw","gemini","qwen","vscode","windsurf"]
-          base   = Path("dotfiles-ai/agents")
+          base   = Path("dotfiles/ai/agents")
           errors = []
 
           REQUIRED_KEYS = {"name", "framework", "tools", "skills"}
@@ -123,7 +120,7 @@ jobs:
           errors = []
 
           # shared registry YAML
-          reg_yaml = Path("dotfiles-ai/shared/skills/registry.yaml")
+          reg_yaml = Path("dotfiles/ai/shared/skills/registry.yaml")
           if reg_yaml.exists():
               try:
                   yaml.safe_load(reg_yaml.read_text())
@@ -134,7 +131,7 @@ jobs:
               errors.append("shared/skills/registry.yaml not found")
 
           # skills registry JSON
-          reg_json = Path("dotfiles-ai/skills/registry.json")
+          reg_json = Path("dotfiles/ai/skills/registry.json")
           if reg_json.exists():
               try:
                   data = json.loads(reg_json.read_text())
@@ -165,9 +162,9 @@ jobs:
           fi
           echo "✓ No obvious hardcoded secrets found"
 
-# ──────────────────────────────────────────────────────────────────────────────
-# JOB 2 — per-agent skill tests (matrix, parallelised)
-# ──────────────────────────────────────────────────────────────────────────────
+  # ──────────────────────────────────────────────────────────────────────────────
+  # JOB 2 — per-agent skill tests (matrix, parallelised)
+  # ──────────────────────────────────────────────────────────────────────────────
   test-skills:
     name: "Test: ${{ matrix.agent }}"
     needs: validate-structure
@@ -192,21 +189,10 @@ jobs:
           pip install --upgrade pip
           pip install pyyaml toml pytest pytest-json-report
 
-          # Install agent-memory package if present
-          if [ -f dotfiles-ai/packages/agent_memory/setup.py ] || \
-             [ -f dotfiles-ai/packages/agent_memory/pyproject.toml ]; then
-            pip install -e dotfiles-ai/packages/agent_memory --quiet
-          fi
-
-          # Install any top-level requirements
-          if [ -f dotfiles-ai/requirements.txt ]; then
-            pip install -r dotfiles-ai/requirements.txt --quiet || true
-          fi
-
       - name: Run skill validator for ${{ matrix.agent }}
         id: skill_test
         run: |
-          python3 dotfiles-ai/scripts/validate_skills.py \
+          python3 dotfiles/ai/scripts/validate_skills.py \
             --agent "${{ matrix.agent }}" \
             --repo-root . \
             --output-json /tmp/result-${{ matrix.agent }}.json
@@ -218,9 +204,9 @@ jobs:
           name: skill-test-${{ matrix.agent }}
           path: /tmp/result-${{ matrix.agent }}.json
 
-# ──────────────────────────────────────────────────────────────────────────────
-# JOB 3 — SKILL.md coverage check across all shared skills
-# ──────────────────────────────────────────────────────────────────────────────
+  # ──────────────────────────────────────────────────────────────────────────────
+  # JOB 3 — SKILL.md coverage check across all shared skills
+  # ──────────────────────────────────────────────────────────────────────────────
   skill-md-coverage:
     name: SKILL.md Coverage
     needs: validate-structure
@@ -237,8 +223,8 @@ jobs:
           from pathlib import Path
 
           roots = [
-              Path("dotfiles-ai/shared/skills"),
-              Path("dotfiles-ai/skills"),
+              Path("dotfiles/ai/shared/skills"),
+              Path("dotfiles/ai/skills"),
           ]
           missing = []
           found   = []
@@ -275,6 +261,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download all test artifacts
         uses: actions/download-artifact@v4
@@ -322,15 +310,24 @@ jobs:
 
       - name: Tag successful deploy
         run: |
+          # Read version
+          VERSION=$(grep '^VERSION=' dotfiles/ai/VERSION | cut -d= -f2)
+          if [[ -z "$VERSION" ]]; then
+            VERSION="skills-deploy-$(date -u +%Y%m%d-%H%M%S)"
+          fi
+          
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "skills-deploy-$(date -u +%Y%m%d-%H%M%S)" || true
-          git push origin --tags || true
+          git tag "$VERSION" || true
+          git push origin "$VERSION" || true
+          
+          echo "Created tag: $VERSION"
 
-      - name: Write deploy badge data
+      - name: Update deploy badge
         run: |
           mkdir -p .github/badges
-          echo '{"schemaVersion":1,"label":"skills","message":"deployed","color":"brightgreen"}' \
+          VERSION=$(grep '^VERSION=' dotfiles/ai/VERSION | cut -d= -f2)
+          echo "{\"schemaVersion\":1,\"label\":\"skills\",\"message\":\"$VERSION\",\"color\":\"brightgreen\"}" \
             > .github/badges/skills.json
 
           git config user.name  "github-actions[bot]"
@@ -339,3 +336,17 @@ jobs:
           git diff --cached --quiet || \
             git commit -m "chore: update skills deploy badge [skip ci]" && \
             git push origin main || true
+
+      - name: Write release notes draft
+        run: |
+          # Generate release notes from CHANGELOG
+          if [[ -f dotfiles/ai/CHANGELOG.md ]]; then
+            VERSION=$(grep '^VERSION=' dotfiles/ai/VERSION | cut -d= -f2)
+            # Extract relevant section (first few lines after version header)
+            awk "/## \\[${VERSION//./\\.}/,/^## \\[/ {print}" dotfiles/ai/CHANGELOG.md > /tmp/release-notes.md || true
+            
+            if [[ -s /tmp/release-notes.md ]]; then
+              echo "Release notes generated for $VERSION"
+              cat /tmp/release-notes.md
+            fi
+          fi
